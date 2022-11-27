@@ -1,5 +1,6 @@
 ﻿using System;
 
+
 namespace job_checker
 {
     class Program
@@ -7,6 +8,7 @@ namespace job_checker
         static void Main(string[] args)
         {
             Console.WriteLine("Hello World!");
+            Console.ReadKey();
         }
     }
 }
