@@ -1,14 +1,13 @@
 ﻿using System;
 
 
-namespace job_checker
+namespace job_checker;
+class Program
 {
-    class Program
+    static void Main(string[] args)
     {
-        static void Main(string[] args)
-        {
-            Console.WriteLine("Hello World!");
-            Console.ReadKey();
-        }
+        Console.WriteLine("Hello World!");
+        Console.ReadKey();
     }
 }
+
