@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 namespace job_checker;
-public static class ExelParser
+public interface IParser
 {
-
+    public List<JobInfo> Parse(string path);
 }
