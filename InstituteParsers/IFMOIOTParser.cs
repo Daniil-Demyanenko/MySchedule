@@ -14,6 +14,8 @@ public class IFMOIOTParser : IParser
     private int _VisibleLinesStartIndex = 38 - 1; // Видимая строка, с которой начинается расписание пар
     private int _GroupNameRow = 5;
 
+    private int[] _GroupPosition = {}; // Позиции групп в расписании не по порядку, скрыты удалённые специализации и т.д. 
+
     public List<JobInfo> Parse(string path)
     {
         List<JobInfo> result = new();
