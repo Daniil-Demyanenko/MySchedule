@@ -8,23 +8,26 @@ namespace job_checker.InstituteParsers;
 /// <summary>
 /// Парсер для расписаний института ИФМОИОТ
 /// </summary>
-public class IFMOIOTParser : IParser
+public class IFMOIOTParser : Parser
 {
     private List<string> _ParsedDay = new();
     private int _VisibleLinesStartIndex = 38 - 1; // Видимая строка, с которой начинается расписание пар
     private int _GroupNameRow = 5;
 
-    private int[] _GroupPosition = {}; // Позиции групп в расписании не по порядку, скрыты удалённые специализации и т.д. 
+    private int[] _GroupPosition = { }; // Позиции групп в расписании не по порядку, скрыты удалённые специализации и т.д. 
 
-    public List<JobInfo> Parse(string path)
+
+    public IFMOIOTParser(string path) : base(path) { }
+    ~IFMOIOTParser() { _Workbook.Dispose(); }
+
+
+    public override List<JobInfo> Parse()
     {
         List<JobInfo> result = new();
-        Workbook wb = new Workbook(path);
-        var sheet = wb.Worksheets[0];
 
-        var dayPos = GetDayRowPositions(sheet);
+        var dayPos = GetDayRowPositions(_Sheet);
 
-        result.AddRange(GetGroupClasses(4, dayPos, sheet));
+        result.AddRange(GetGroupClasses(4, dayPos, _Sheet));
 
         WriteLine();
         foreach (var i in result)
@@ -32,14 +35,10 @@ public class IFMOIOTParser : IParser
             WriteLine("{0} {1} {2} {3} {4}", i.Course, i.Group, i.Day, i.Title, i.Number);
         }
 
-
-        wb.Dispose();
-        sheet.Dispose();
-
         return result;
     }
 
-    private List<DayData> GetDayRowPositions(Worksheet sheet)
+    private List<DayData> GetDayRowPositions(Worksheet sheet) //BUG: Переписать, определяя, не скрыта ли ячейка
     {
         List<DayData> dayPosition = new();
 
@@ -60,7 +59,7 @@ public class IFMOIOTParser : IParser
         return dayPosition;
     }
 
-    private List<JobInfo> GetGroupClasses(int col, List<DayData> dayPos, Worksheet sheet)
+    private List<JobInfo> GetGroupClasses(int col, List<DayData> dayPos, Worksheet sheet) //BUG: Переписать, определяя, не скрыта ли ячейка
     {
         var result = new List<JobInfo>();
 
