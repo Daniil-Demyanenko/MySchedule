@@ -4,6 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 
 namespace job_checker;
+
+/// <summary>
+/// Описание пары
+/// </summary>
+/// <value></value>
 public record JobInfo
 {
     /// <summary>
