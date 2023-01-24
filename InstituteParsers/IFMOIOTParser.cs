@@ -2,6 +2,7 @@ using System;
 using Aspose.Cells;
 using System.Collections.Generic;
 using static System.Console;
+#nullable enable
 
 namespace job_checker.InstituteParsers;
 
@@ -44,7 +45,7 @@ public class IFMOIOTParser : Parser
 
         for (int i = _VisibleLinesStartIndex; i < sheet.Cells.MaxDataRow; i++)
         {
-            var cellValue = sheet.Cells[i, 0].Value?.ToString().Trim();
+            var cellValue = sheet.Cells[i, 0].Value?.ToString()?.Trim();
 
             if (cellValue is not null &&        //Ячейка имеет значение, содержит день недели, который встречается только в первый раз
                 cellValue.ContainsDay() &&

@@ -8,7 +8,7 @@ namespace job_checker.InstituteParsers;
 public abstract class Parser
 {
     protected CellPosition _FirstVisibleCell;
-    protected Workbook _Workbook = new Workbook(AppDomain.CurrentDomain.BaseDirectory + "/r.xls");
+    protected Workbook _Workbook ;
     protected Worksheet _Sheet;
 
     protected Parser(string path)

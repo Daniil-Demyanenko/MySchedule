@@ -6,7 +6,7 @@ class Program
 {
     static void Main(string[] args)
     {
-        JobParser.Parse();
+        CoupleSchedule.Update();
         Console.ReadKey();
     }
 }
