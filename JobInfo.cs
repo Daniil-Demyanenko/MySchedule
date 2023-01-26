@@ -20,6 +20,10 @@ public record JobInfo
     /// </summary>
     public string Day { get; init; }
     /// <summary>
+    /// День недели
+    /// </summary>
+    public string Date { get; init; }
+    /// <summary>
     /// Номер аудитории
     /// </summary>
     public string Cabinet { get; init; }
@@ -42,6 +46,6 @@ public record JobInfo
 
 
 
-    public JobInfo(string title, string day, string cabinet, string group, string institute, int number, int course) =>
-        (Title, Day, Cabinet, Group, Institute, Number, Course) = (title, day, cabinet, group, institute, number, course);
+    public JobInfo(string title, string date, string day, string cabinet, string group, string institute, int number, int course) =>
+        (Title, Date, Day, Cabinet, Group, Institute, Number, Course) = (title, date, day, cabinet, group, institute, number, course);
 }

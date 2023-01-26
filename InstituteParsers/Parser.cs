@@ -5,10 +5,10 @@ using System.Threading.Tasks;
 using Aspose.Cells;
 
 namespace job_checker.InstituteParsers;
-public abstract class Parser
+public abstract class Parser: IDisposable
 {
     protected CellPosition _FirstVisibleCell;
-    protected Workbook _Workbook ;
+    protected Workbook _Workbook;
     protected Worksheet _Sheet;
 
     protected Parser(string path)
@@ -17,7 +17,11 @@ public abstract class Parser
         _Sheet = _Workbook.Worksheets[0];
         _FirstVisibleCell = GetFirstVisibleCell();
     }
-
+    public void Dispose()
+    {
+        _Sheet.Dispose();
+        _Workbook.Dispose();
+    }
 
     public abstract List<JobInfo> Parse();
 
@@ -25,7 +29,7 @@ public abstract class Parser
     {
         int colCount = 1000;
 
-        for (int row = 7; row < 200; row++)
+        for (int row = 7; row < 1000; row++)
         {
             if (_Sheet.Cells.Rows[row].IsHidden) continue;
             for (int col = 3; col < colCount; col++)
@@ -41,6 +45,23 @@ public abstract class Parser
         }
 
         throw new Exception("Bad Exel file");
+    }
+
+
+
+    /// <summary>
+    /// Положение и название дня недели
+    /// </summary>
+    protected struct DayData
+    {
+        /// <summary>
+        /// Столбец группы
+        /// </summary>
+        public int Pos;
+        public string Name;
+        public string Date;
+        public DayData(int pos, string name, string date) => (Pos, Name, Date) = (pos, name, date);
+
     }
 }
 

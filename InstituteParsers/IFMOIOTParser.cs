@@ -9,14 +9,14 @@ namespace job_checker.InstituteParsers;
 /// <summary>
 /// Парсер для расписаний института ИФМОИОТ
 /// </summary>
-public class IFMOIOTParser : Parser
+public class IFMOIOTParser : Parser, IDisposable
 {
-    private List<string> _ParsedDay = new();
-    private int _VisibleLinesStartIndex = 38 - 1; // Видимая строка, с которой начинается расписание пар
-    private int _GroupNameRow = 5;
+    //private int _VisibleLinesStartIndex = 38 - 1; // Видимая строка, с которой начинается расписание пар
+    private int _GroupNameRow = 5; // Строка с названиями групп
 
     private int[] _GroupPosition = { }; // Позиции групп в расписании не по порядку, скрыты удалённые специализации и т.д. 
 
+            //TODO: заменить числовые константы на DateCol, TimeCol, DayCol, GroupNameRow и т.д.
 
     public IFMOIOTParser(string path) : base(path) { }
     ~IFMOIOTParser() { _Workbook.Dispose(); }
@@ -26,33 +26,38 @@ public class IFMOIOTParser : Parser
     {
         List<JobInfo> result = new();
 
-        var dayPos = GetDayRowPositions(_Sheet);
+        var dayPos = GetDayRowPositions();
 
-        result.AddRange(GetGroupClasses(4, dayPos, _Sheet));
+        result.AddRange(GetGroupClasses(4, dayPos));
 
         WriteLine();
         foreach (var i in result)
         {
-            WriteLine("{0} {1} {2} {3} {4}", i.Course, i.Group, i.Day, i.Title, i.Number);
+            WriteLine("{0} {1} \n{2} {3} {4} {5}\n\n", i.Date, i.Day, i.Course, i.Group, i.Title, i.Number);
         }
 
         return result;
     }
 
-    private List<DayData> GetDayRowPositions(Worksheet sheet) //BUG: Переписать, определяя, не скрыта ли ячейка
+    /// <summary>
+    /// Возвращает позиции не скрытых дней недели в расписании
+    /// </summary>
+    /// <param name="sheet"></param>
+    /// <returns></returns>
+    private List<DayData> GetDayRowPositions() //TODO: DayData заменить на обычный лист int'ов. Все данные все равно можно получить в GetGroupClasses
     {
         List<DayData> dayPosition = new();
 
-        for (int i = _VisibleLinesStartIndex; i < sheet.Cells.MaxDataRow; i++)
+        for (int i = _FirstVisibleCell.Row; i < _Sheet.Cells.MaxDataRow; i++)
         {
-            var cellValue = sheet.Cells[i, 0].Value?.ToString()?.Trim();
+            var cellValue = _Sheet.Cells[i, 0].Value?.ToString()?.Trim();
 
-            if (cellValue is not null &&        //Ячейка имеет значение, содержит день недели, который встречается только в первый раз
-                cellValue.ContainsDay() &&
-                !_ParsedDay.Contains(cellValue))
+            if (cellValue is not null &&        //Ячейка имеет значение, содержит день недели, не является скрытой
+                cellValue.ContainsDay() && 
+                !_Sheet.Cells.Rows[i].IsHidden
+                )
             {
-                dayPosition.Add(new DayData(i, cellValue));
-                _ParsedDay.Add(cellValue);
+                dayPosition.Add(new DayData(pos: i, name: cellValue, date: _Sheet.Cells[i, 1].Value?.ToString()?.Trim()));
             }
         }
 
@@ -60,21 +65,29 @@ public class IFMOIOTParser : Parser
         return dayPosition;
     }
 
-    private List<JobInfo> GetGroupClasses(int col, List<DayData> dayPos, Worksheet sheet) //BUG: Переписать, определяя, не скрыта ли ячейка
+    /// <summary>
+    /// Возвращает информацию о парах для определённой группы
+    /// </summary>
+    /// <param name="col">колонка с группой</param>
+    /// <param name="dayPos">Позиции дней недели</param>
+    /// <returns></returns>
+    private List<JobInfo> GetGroupClasses(int col, List<DayData> dayPos)
     {
         var result = new List<JobInfo>();
 
-        string[] groupTitle = sheet.Cells[_GroupNameRow, col].Value.ToString().Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries);
-        string groupName = String.Join(' ', groupTitle[1..]);
-        int course = int.Parse(groupTitle[0]);
+        string[] groupTitle = _Sheet.Cells[_GroupNameRow, col].Value.ToString().Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries); // Полное название группы
+        string groupName = String.Join(' ', groupTitle[1..]); // Только название группы
+        int course = int.Parse(groupTitle[0]); // Только курс группы
 
         foreach (var day in dayPos)
             for (int i = 0; i < 4; i++)
             {
-                string? className = sheet.Cells[day.Pos + i, col].Value?.ToString() ?? null;
+                string? className = _Sheet.Cells[day.Pos + i, col].Value?.ToString() ?? null;
                 if (className is null) continue;
 
-                var classItem = new JobInfo(className, day.Name, "", groupName, "ИФМОИОТ", i + 1, course);
+                var date = day.Date + " (" + _Sheet.Cells[day.Pos + i, 2].Value.ToString().Trim() +")";
+                var classItem = new JobInfo(className, date , 
+                                    day.Name, cabinet:"", groupName, "ИФМОИОТ", number: i + 1, course);
                 result.Add(classItem);
             }
 
@@ -82,11 +95,5 @@ public class IFMOIOTParser : Parser
     }
 
 
-    private struct DayData
-    {
-        public int Pos;
-        public string Name;
 
-        public DayData(int pos, string name) => (Pos, Name) = (pos, name);
-    }
 }
