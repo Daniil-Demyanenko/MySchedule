@@ -3,7 +3,7 @@ using System.IO;
 
 namespace job_checker
 {
-    public static class scheduleDownloader
+    public static class ScheduleDownloader
     {
         private static string dir = AppDomain.CurrentDomain.BaseDirectory + "/Cache"; //Путь к папке Cache в директории программы
         public static void CheckUpdate()
