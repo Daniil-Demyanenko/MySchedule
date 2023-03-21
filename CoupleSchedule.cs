@@ -10,12 +10,12 @@ namespace job_checker;
 /// </summary>
 public static class CoupleSchedule
 {
-    private static List<JobInfo> _Jobs;
+    private static List<ClassInfo> _Jobs;
     /// <summary>
     /// Список пар всех институтов
     /// </summary>
     /// <value></value>
-    public static IEnumerable<JobInfo> Jobs => _Jobs;
+    public static IEnumerable<ClassInfo> Jobs => _Jobs;
 
 
     /// <summary>
