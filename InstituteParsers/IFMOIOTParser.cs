@@ -9,7 +9,7 @@ namespace job_checker.InstituteParsers;
 /// <summary>
 /// Парсер для расписаний института ИФМОИОТ
 /// </summary>
-public class IFMOIOTParser : Parser, IDisposable
+public class IFMOIOTParser : AbstractParser, IDisposable
 {
     //private int _VisibleLinesStartIndex = 38 - 1; // Видимая строка, с которой начинается расписание пар
     private int _GroupNameRow = 5; // Строка с названиями групп
@@ -22,11 +22,11 @@ public class IFMOIOTParser : Parser, IDisposable
     ~IFMOIOTParser() { _Workbook.Dispose(); }
 
 
-    public override List<JobInfo> Parse()
+    public override List<ClassInfo> Parse()
     {
-        List<JobInfo> result = new();
+        List<ClassInfo> result = new();
 
-        var dayPos = GetDayRowPositions();
+        var dayPos = GetDaysRowInformation();
 
         result.AddRange(GetGroupClasses(4, dayPos));
 
@@ -40,10 +40,10 @@ public class IFMOIOTParser : Parser, IDisposable
     }
 
     /// <summary>
-    /// Возвращает позиции не скрытых дней недели в расписании
+    /// Возвращает информацию о не скрытых днях недели в расписании
     /// </summary>
     /// <returns></returns>
-    private List<DayData> GetDayRowPositions() //TODO: DayData заменить на обычный лист int'ов. Все данные все равно можно получить в GetGroupClasses
+    private List<DayData> GetDaysRowInformation()
     {
         List<DayData> dayPosition = new();
 
@@ -70,9 +70,9 @@ public class IFMOIOTParser : Parser, IDisposable
     /// <param name="col">колонка с группой</param>
     /// <param name="dayPos">Позиции дней недели</param>
     /// <returns></returns>
-    private List<JobInfo> GetGroupClasses(int col, List<DayData> dayPos)
+    private List<ClassInfo> GetGroupClasses(int col, List<DayData> dayPos)
     {
-        var result = new List<JobInfo>();
+        var result = new List<ClassInfo>();
 
         string[] groupTitle = _Sheet.Cells[_GroupNameRow, col].Value.ToString().Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries); // Полное название группы
         string groupName = String.Join(' ', groupTitle[1..]); // Только название группы
@@ -85,7 +85,7 @@ public class IFMOIOTParser : Parser, IDisposable
                 if (className is null) continue;
 
                 var date = day.Date + " (" + _Sheet.Cells[day.Pos + i, 2].Value.ToString().Trim() +")";
-                var classItem = new JobInfo(className, date , 
+                var classItem = new ClassInfo(className, date , 
                                     day.Name, cabinet:"", groupName, "ИФМОИОТ", number: i + 1, course);
                 result.Add(classItem);
             }

@@ -9,7 +9,7 @@ namespace job_checker;
 /// Описание пары
 /// </summary>
 /// <value></value>
-public record JobInfo
+public record ClassInfo
 {
     /// <summary>
     /// Название предмета
@@ -46,6 +46,6 @@ public record JobInfo
 
 
 
-    public JobInfo(string title, string date, string day, string cabinet, string group, string institute, int number, int course) =>
+    public ClassInfo(string title, string date, string day, string cabinet, string group, string institute, int number, int course) =>
         (Title, Date, Day, Cabinet, Group, Institute, Number, Course) = (title, date, day, cabinet, group, institute, number, course);
 }

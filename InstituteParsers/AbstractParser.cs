@@ -5,13 +5,13 @@ using System.Threading.Tasks;
 using Aspose.Cells;
 
 namespace job_checker.InstituteParsers;
-public abstract class Parser: IDisposable
+public abstract class AbstractParser: IDisposable
 {
     protected CellPosition _FirstVisibleCell;
     protected Workbook _Workbook;
     protected Worksheet _Sheet;
 
-    protected Parser(string path)
+    protected AbstractParser(string path)
     {
         _Workbook = new Workbook(path);//new Workbook(AppDomain.CurrentDomain.BaseDirectory + "/r.xls");
         _Sheet = _Workbook.Worksheets[0];
@@ -23,7 +23,7 @@ public abstract class Parser: IDisposable
         _Workbook.Dispose();
     }
 
-    public abstract List<JobInfo> Parse();
+    public abstract List<ClassInfo> Parse();
 
     protected CellPosition GetFirstVisibleCell()
     {
