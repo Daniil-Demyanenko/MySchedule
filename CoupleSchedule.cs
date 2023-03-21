@@ -12,7 +12,7 @@ public static class CoupleSchedule
 {
     private static List<JobInfo> _Jobs;
     /// <summary>
-    /// Список пар со всех пар
+    /// Список пар всех институтов
     /// </summary>
     /// <value></value>
     public static IEnumerable<JobInfo> Jobs => _Jobs;
