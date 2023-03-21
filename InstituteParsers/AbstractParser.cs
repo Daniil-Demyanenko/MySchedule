@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Aspose.Cells;
 
 namespace job_checker.InstituteParsers;
-public abstract class AbstractParser: IDisposable
+public abstract class AbstractParser : IDisposable
 {
     protected CellPosition _FirstVisibleCell;
     protected Workbook _Workbook;
@@ -47,6 +47,19 @@ public abstract class AbstractParser: IDisposable
         throw new Exception("Bad Exel file");
     }
 
+    /// <summary>
+    /// Строка является названием дня недели?
+    /// </summary>
+    /// <param name="str"></param>
+    /// <returns></returns>
+    public static bool isContainsDay(string str)
+    {
+        var days = new string[] { "понедельник", "вторник", "среда", "четверг", "пятница", "суббота" };
+        foreach (var day in days)
+            if (str.Contains(day, StringComparison.InvariantCultureIgnoreCase)) return true;
+
+        return false;
+    }
 
 
     /// <summary>
