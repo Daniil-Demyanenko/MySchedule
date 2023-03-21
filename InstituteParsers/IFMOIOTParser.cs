@@ -42,7 +42,6 @@ public class IFMOIOTParser : Parser, IDisposable
     /// <summary>
     /// Возвращает позиции не скрытых дней недели в расписании
     /// </summary>
-    /// <param name="sheet"></param>
     /// <returns></returns>
     private List<DayData> GetDayRowPositions() //TODO: DayData заменить на обычный лист int'ов. Все данные все равно можно получить в GetGroupClasses
     {
