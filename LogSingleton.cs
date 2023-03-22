@@ -13,6 +13,7 @@ namespace job_checker
         /// </summary>
         public LogLevels LogLevel = LogLevels.Debug;
         private static LogSingleton _log = null;
+        private static object sync = new object();
 
 
         /// <summary>
@@ -24,8 +25,11 @@ namespace job_checker
             get
             {
                 if (_log == null)
-                    _log = new LogSingleton();
-
+                    lock (sync)
+                    {
+                        if (_log == null)
+                            _log = new LogSingleton();
+                    }
                 return _log;
             }
         }
@@ -45,7 +49,8 @@ namespace job_checker
         public void Log(LogLevels level, params object[] args)
         {
             if (level <= LogLevel)
-                Console.Write(String.Format(args[0].ToString(), args.Length > 1 ? args[1..] : new object[0]));
+                Console.Write(String.Format(args[0].ToString(), args.Length > 1 ? args[1..] : new object[0
+                ]));
         }
 
     }
