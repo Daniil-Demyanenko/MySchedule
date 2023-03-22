@@ -18,17 +18,18 @@ public class IFMOIOTParser : AbstractParser, IDisposable
     private int _firstColWithCouple = 3;
 
     // Позиции групп в расписании не по порядку, скрыты удалённые специализации и т.д. 
-    private List<int> _GroupNamePositions;
+    private List<int>? _GroupNamePositions;
 
     //TODO: заменить числовые константы на DateCol, TimeCol, DayCol, GroupNameRow и т.д.
 
     public IFMOIOTParser(string path) : base(path) { }
-    ~IFMOIOTParser() { _Workbook.Dispose(); }
+    ~IFMOIOTParser() {base.Dispose(); }
 
 
     public override List<ClassInfo> Parse()
     {
         List<ClassInfo> result = new();
+        var lvl = LogLevels.Debug; //уровень логирования
 
         _GroupNameRow = 5;
         _GroupNamePositions = GetGroupNamePositions();
@@ -37,15 +38,14 @@ public class IFMOIOTParser : AbstractParser, IDisposable
         foreach (var pos in _GroupNamePositions)
             result.AddRange(GetGroupClasses(4, dayPos));
 
-        WriteLine();
+
         foreach (var i in result)
-            WriteLine("{0} {1} \n{2} {3} {4} {5}\n\n", i.Date, i.Day, i.Course, i.Group, i.Title, i.Number);
+            LogSingleton.Instance.LogLine(lvl, "{0} {1} \n{2} {3} {4} {5}\n\n", i.Date, i.Day, i.Course, i.Group, i.Title, i.Number);
 
-        WriteLine();
         foreach (var i in _GroupNamePositions)
-            Write("{0} ", i);
+            LogSingleton.Instance.Log(lvl, $"{i} ");
 
-        WriteLine(_Sheet.Cells[_GroupNameRow, 63].Value.ToString().Trim());
+        LogSingleton.Instance.Log(lvl, _Sheet.Cells[_GroupNameRow, 63].Value.ToString()?.Trim());
 
 
         return result;
@@ -94,7 +94,7 @@ public class IFMOIOTParser : AbstractParser, IDisposable
                 string? className = _Sheet.Cells[day.Pos + i, col].Value?.ToString() ?? null;
                 if (className is null) continue;
 
-                var date = day.Date + " (" + _Sheet.Cells[day.Pos + i, 2].Value.ToString().Trim() + ")";
+                var date = day.Date + " (" + _Sheet.Cells[day.Pos + i, 2].Value.ToString()?.Trim() + ")";
                 var classItem = new ClassInfo(className, date,
                                     day.Name, cabinet: "", groupName, "ИФМОИОТ", number: i + 1, course);
                 result.Add(classItem);

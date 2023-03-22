@@ -34,7 +34,19 @@ namespace job_checker
 
         private static void Download()
         {
-
+            try
+            {
+                //скачиваем
+            }
+            catch (System.Exception ex)
+            {
+                LogSingleton.Instance.LogLine(LogLevels.Error, $"Ошибка при скачивании расписания ({ex.Message})");
+            }
+            finally
+            {
+                //удалить IDisposable объекты
+                
+            }
         }
     }
 }
