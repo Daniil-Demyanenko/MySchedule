@@ -35,8 +35,15 @@ public class IFMOIOTParser : AbstractParser, IDisposable
         _GroupNamePositions = GetGroupNamePositions();
         var dayPos = GetDaysRowInformation();
 
-       foreach (var pos in _GroupNamePositions)
-           result.AddRange(GetGroupClasses(pos, dayPos));
+        foreach (var pos in _GroupNamePositions)
+        {
+            if (pos >= 83)
+                Console.WriteLine();
+
+            result.AddRange(GetGroupClasses(pos, dayPos));
+        }
+
+
 
         foreach (var i in result)
             Console.WriteLine("{0, -30} {1} \n{2, -2} {3} \n{4, -2} {5}\n\n", i.Date, i.Day, i.Course, i.Group, i.Number, i.Title);
@@ -44,8 +51,8 @@ public class IFMOIOTParser : AbstractParser, IDisposable
         foreach (var i in _GroupNamePositions)
             Console.Write($"{i} ");
 
-        Console.WriteLine(_Sheet.Cells[_GroupNameRow, 63].Value.ToString()?.Trim());
-
+        Console.WriteLine();
+        Console.WriteLine(_Sheet.Cells.MaxDataColumn);
 
         return result;
     }
@@ -79,7 +86,7 @@ public class IFMOIOTParser : AbstractParser, IDisposable
     /// </summary>
     /// <param name="col">колонка с группой</param>
     /// <param name="dayPos">Позиции дней недели</param>
-    private List<ClassInfo> GetGroupClasses(int col, List<DayData> dayPos) //TODO: Реализовать для двухъячеечных групп корректное добавление пар и имени группы
+    private List<ClassInfo> GetGroupClasses(int col, List<DayData> dayPos)
     {
         var result = new List<ClassInfo>();
         int course;
@@ -109,7 +116,7 @@ public class IFMOIOTParser : AbstractParser, IDisposable
     /// <summary>
     /// Разделяет название группы на Курс и Направление подготовки
     /// </summary>
-    /// <param name="colWithGroup"></param>
+    /// <param name="colWithGroup">индекс колонки с названием группы</param>
     /// <returns>(Курс, Направление подготовки)</returns>
     private (int, string) SplitGroupName(int colWithGroup)
     {
@@ -124,7 +131,7 @@ public class IFMOIOTParser : AbstractParser, IDisposable
     /// Разделяет название группы на Курс и Направление подготовки.
     /// Добавляет уточнение для объеденённых групп в название
     /// </summary>
-    /// <param name="colWithGroup"></param>
+    /// <param name="colWithGroup">индекс колонки с названием группы</param>
     /// <returns>(Курс, Направление подготовки)</returns>
     private (int, string) SplitGroupNameForMerged(int colWithGroup)
     {
@@ -136,7 +143,7 @@ public class IFMOIOTParser : AbstractParser, IDisposable
 
         string appendName = _Sheet.Cells[_GroupNameRow + 1, isSecondCell ? colWithGroup + 1 : colWithGroup].Value.ToString().Trim()[0..^1].Trim();
         groupName += $" [{appendName}]";
-        
+
 
         return (course, groupName);
     }
@@ -148,7 +155,7 @@ public class IFMOIOTParser : AbstractParser, IDisposable
     {
         List<int> result = new();
 
-        for (int i = _firstColWithCouple; i < _Sheet.Cells.MaxDataRow; i++)
+        for (int i = _firstColWithCouple; i < _Sheet.Cells.MaxDataColumn; i++)
         {
             var cellValue = _Sheet.Cells[_GroupNameRow + 1, i].Value?.ToString()?.Trim();
 
