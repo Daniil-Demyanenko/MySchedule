@@ -40,7 +40,7 @@ namespace job_checker
             }
             catch (System.Exception ex)
             {
-                LogSingleton.Instance.LogLine(LogLevels.Error, $"Ошибка при скачивании расписания ({ex.Message})");
+                Console.WriteLine($"###### Ошибка при скачивании расписания ({ex.Message})");
             }
             finally
             {
