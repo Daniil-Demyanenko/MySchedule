@@ -10,19 +10,23 @@ public abstract class AbstractParser : IDisposable
     protected CellPosition _FirstVisibleCell;
     protected Workbook _Workbook;
     protected Worksheet _Sheet;
+    protected int _MaxDataCol;
+    protected int _MaxDataRow;
 
-    protected AbstractParser(string path)
+    protected AbstractParser(string path) // TODO: Добавить поиск листа с данными, например у OFO_MAG_IFMOIOT только на третем листе есть расписание
     {
         _Workbook = new Workbook(path);//new Workbook(AppDomain.CurrentDomain.BaseDirectory + "/r.xls");
-        _Sheet = _Workbook.Worksheets[0];
+        _Sheet = FindPageWithSchedule();
         _FirstVisibleCell = GetFirstVisibleCell();
+        _MaxDataCol = _Sheet.Cells.MaxDataColumn;
+        _MaxDataRow = _Sheet.Cells.MaxDataRow;
     }
     public void Dispose()
     {
         _Sheet.Dispose();
         _Workbook.Dispose();
     }
-
+    
     public abstract List<ClassInfo> Parse();
 
     protected CellPosition GetFirstVisibleCell()
@@ -47,12 +51,22 @@ public abstract class AbstractParser : IDisposable
         throw new Exception("Bad Exel file");
     }
 
+
+    private Worksheet FindPageWithSchedule()
+    {
+        for (int i = 0; i < _Workbook.Worksheets.Count; i++)
+        {
+            var sheet = _Workbook.Worksheets[i];
+            if (sheet.Cells.MaxDataColumn >= 10 && sheet.Cells.MaxDataRow >= 7) return sheet;
+            sheet.Dispose();
+        }
+        throw new Exception($"Не найдено страницы с расписанием в файле {_Workbook.AbsolutePath}");
+    }
+
     /// <summary>
     /// Строка является названием дня недели?
     /// </summary>
-    /// <param name="str"></param>
-    /// <returns></returns>
-    public static bool isContainsDay(string str)
+    public static bool IsContainDay(string str)
     {
         var days = new string[] { "понедельник", "вторник", "среда", "четверг", "пятница", "суббота" };
         foreach (var day in days)
@@ -65,7 +79,7 @@ public abstract class AbstractParser : IDisposable
     /// <summary>
     /// Положение и название дня недели
     /// </summary>
-    protected struct DayData
+    protected record DayData
     {
         /// <summary>
         /// Столбец группы

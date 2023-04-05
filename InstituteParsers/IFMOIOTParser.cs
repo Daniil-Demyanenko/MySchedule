@@ -1,9 +1,5 @@
 using System;
-using Aspose.Cells;
 using System.Collections.Generic;
-using System.Linq;
-using static System.Console;
-using System.Text;
 #nullable enable
 
 namespace job_checker.InstituteParsers;
@@ -52,7 +48,7 @@ public class IFMOIOTParser : AbstractParser, IDisposable
             Console.Write($"{i} ");
 
         Console.WriteLine();
-        Console.WriteLine(_Sheet.Cells.MaxDataColumn);
+        Console.WriteLine(_MaxDataCol);
 
         return result;
     }
@@ -64,12 +60,12 @@ public class IFMOIOTParser : AbstractParser, IDisposable
     {
         List<DayData> dayPosition = new();
 
-        for (int i = _FirstVisibleCell.Row; i < _Sheet.Cells.MaxDataRow; i++)
+        for (int i = _FirstVisibleCell.Row; i < _MaxDataRow; i++)
         {
             var cellValue = _Sheet.Cells[i, 0].Value?.ToString()?.Trim();
 
             if (cellValue is not null &&        //Ячейка имеет значение, содержит день недели, не является скрытой
-                isContainsDay(cellValue) &&
+                IsContainDay(cellValue) &&
                 !_Sheet.Cells.Rows[i].IsHidden
                 )
             {
@@ -155,7 +151,7 @@ public class IFMOIOTParser : AbstractParser, IDisposable
     {
         List<int> result = new();
 
-        for (int i = _firstColWithCouple; i < _Sheet.Cells.MaxDataColumn; i++)
+        for (int i = _firstColWithCouple; i < _MaxDataCol; i++)
         {
             var cellValue = _Sheet.Cells[_GroupNameRow + 1, i].Value?.ToString()?.Trim();
 
