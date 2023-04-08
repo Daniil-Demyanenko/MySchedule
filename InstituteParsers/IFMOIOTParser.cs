@@ -9,16 +9,14 @@ namespace job_checker.InstituteParsers;
 /// </summary>
 public class IFMOIOTParser : AbstractParser, IDisposable
 {
-    //private int _VisibleLinesStartIndex = 38 - 1; // Видимая строка, с которой начинается расписание пар
     private int _GroupNameRow = 5; // Строка с названиями групп
 
     // Индекс столбца, с которого начинаются названия групп
     private int _firstColWithCouple = 3;
 
-    // Позиции групп в расписании не по порядку, скрыты удалённые специализации и т.д. 
+    // Позиции групп в расписании, не по порядку, исключая удалённые специализации и т.д. 
     private List<int>? _GroupNamePositions;
 
-    //TODO: заменить числовые константы на DateCol, TimeCol, DayCol, GroupNameRow и т.д.
 
     public IFMOIOTParser(string path) : base(path) { }
     ~IFMOIOTParser() { base.Dispose(); }
@@ -32,12 +30,7 @@ public class IFMOIOTParser : AbstractParser, IDisposable
         var dayPos = GetDaysRowInformation();
 
         foreach (var pos in _GroupNamePositions)
-        {
-            if (pos >= 83)
-                Console.WriteLine();
-
             result.AddRange(GetGroupClasses(pos, dayPos));
-        }
 
         return result;
     }
@@ -54,14 +47,12 @@ public class IFMOIOTParser : AbstractParser, IDisposable
             var cellValue = _Sheet.Cells[i, 0].Value?.ToString()?.Trim();
 
             if (cellValue is not null &&        //Ячейка имеет значение, содержит день недели, не является скрытой
-                IsContainDay(cellValue) &&
-                !_Sheet.Cells.Rows[i].IsHidden
-                )
+                IsContainDayOfWeek(cellValue) &&
+                !_Sheet.Cells.Rows[i].IsHidden)
             {
                 dayPosition.Add(new DayData(pos: i, name: cellValue, date: _Sheet.Cells[i, 1].Value?.ToString()?.Trim()));
             }
         }
-
 
         return dayPosition;
     }
@@ -81,17 +72,14 @@ public class IFMOIOTParser : AbstractParser, IDisposable
             (course, groupName) = SplitGroupNameForMerged(colWithGroup: col);
         else (course, groupName) = SplitGroupName(colWithGroup: col);
 
-
-
         foreach (var day in dayPos)
             for (int i = 0; i < 4; i++)
             {
                 string? className = _Sheet.Cells[day.Pos + i, col].Value?.ToString() ?? null;
                 if (className is null) continue;
 
-                var date = day.Date + " (" + _Sheet.Cells[day.Pos + i, 2].Value.ToString()?.Trim() + ")";
-                var classItem = new ClassInfo(className, date,
-                                    day.Name, groupName, course);
+                var time = _Sheet.Cells[day.Pos + i, 2].Value.ToString()?.Trim();
+                var classItem = new ClassInfo(className, day.Date, day.Name, time, groupName, course);
                 result.Add(classItem);
             }
 
@@ -106,7 +94,7 @@ public class IFMOIOTParser : AbstractParser, IDisposable
     private (int, string) SplitGroupName(int colWithGroup)
     {
         string[] groupTitle = _Sheet.Cells[_GroupNameRow, colWithGroup].Value.ToString().Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries); // Полное название группы
-        string groupName = String.Join(' ', groupTitle[1..]); // Только название группы
+        string groupName = String.Join(' ', groupTitle[1..]).Trim(); // Только название группы
         int course = int.Parse(groupTitle[0]); // Только курс группы
 
         return (course, groupName);

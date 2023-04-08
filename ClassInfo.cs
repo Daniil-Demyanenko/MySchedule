@@ -31,9 +31,13 @@ public record ClassInfo
     /// Номер курса
     /// </summary>
     public int Course { get; init; }
+    /// <summary>
+    /// Время пары
+    /// </summary>
+    public string Time { get; init; }
 
 
 
-    public ClassInfo(string title, string date, string day, string group, int course) =>
-        (Title, Date, Day, Group, Course) = (title, date, day, group, course);
+    public ClassInfo(string title, string date, string day, string time, string group, int course) =>
+        (Title, Date, Day, Time, Group, Course) = (title, date, day, time, group, course);
 }

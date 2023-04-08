@@ -70,7 +70,7 @@ public abstract class AbstractParser : IDisposable
     /// <summary>
     /// Строка является названием дня недели?
     /// </summary>
-    public static bool IsContainDay(string str)
+    public static bool IsContainDayOfWeek(string str)
     {
         var days = new string[] { "понедельник", "вторник", "среда", "четверг", "пятница", "суббота" };
         foreach (var day in days)
