@@ -20,25 +20,13 @@ public record ClassInfo
     /// </summary>
     public string Day { get; init; }
     /// <summary>
-    /// День недели
+    /// Полная дата
     /// </summary>
     public string Date { get; init; }
-    /// <summary>
-    /// Номер аудитории
-    /// </summary>
-    public string Cabinet { get; init; }
     /// <summary>
     /// Название группы
     /// </summary>
     public string Group { get; init; }
-    /// <summary>
-    /// Название института
-    /// </summary>
-    public string Institute { get; init; }
-    /// <summary>
-    /// Номер пары в расписании
-    /// </summary>
-    public int Number { get; init; }
     /// <summary>
     /// Номер курса
     /// </summary>
@@ -46,6 +34,6 @@ public record ClassInfo
 
 
 
-    public ClassInfo(string title, string date, string day, string cabinet, string group, string institute, int number, int course) =>
-        (Title, Date, Day, Cabinet, Group, Institute, Number, Course) = (title, date, day, cabinet, group, institute, number, course);
+    public ClassInfo(string title, string date, string day, string group, int course) =>
+        (Title, Date, Day, Group, Course) = (title, date, day, group, course);
 }

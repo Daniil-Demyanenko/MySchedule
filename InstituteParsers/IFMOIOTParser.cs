@@ -39,17 +39,6 @@ public class IFMOIOTParser : AbstractParser, IDisposable
             result.AddRange(GetGroupClasses(pos, dayPos));
         }
 
-
-
-        foreach (var i in result)
-            Console.WriteLine("{0, -30} {1} \n{2, -2} {3} \n{4, -2} {5}\n\n", i.Date, i.Day, i.Course, i.Group, i.Number, i.Title);
-
-        foreach (var i in _GroupNamePositions)
-            Console.Write($"{i} ");
-
-        Console.WriteLine();
-        Console.WriteLine(_MaxDataCol);
-
         return result;
     }
 
@@ -102,7 +91,7 @@ public class IFMOIOTParser : AbstractParser, IDisposable
 
                 var date = day.Date + " (" + _Sheet.Cells[day.Pos + i, 2].Value.ToString()?.Trim() + ")";
                 var classItem = new ClassInfo(className, date,
-                                    day.Name, cabinet: "", groupName, "ИФМОИОТ", number: i + 1, course);
+                                    day.Name, groupName, course);
                 result.Add(classItem);
             }
 

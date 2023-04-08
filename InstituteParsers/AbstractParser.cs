@@ -4,6 +4,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Aspose.Cells;
 
+// TODO:
+// Поиск имён преподавателей, регулярка: \b[\w]{4,}\b\s+\w\.\s*\w\.*
+// Поиск номера аудитории, регулярка: \b\d{1,}-{0,1}\d{2,}\w{0,1}
+
 namespace job_checker.InstituteParsers;
 public abstract class AbstractParser : IDisposable
 {
