@@ -16,7 +16,7 @@ class Program
         //////////////// Вывод спаршеных групп, перед релизом удалить ////////////////
         //var a = CoupleSchedule.Couples.Select(x => x.Course + " " + x.Group).Distinct();
         var a = CoupleSchedule.Couples.Where(x => x.Course == 3 && x.Group.ToLower() == "по (инф)") // Выбираем пары у конкретной группы
-                                      .Select(x=> $"{x.Date, 10} \t {x.Time, 10} \t {x.Title}");    // Формируем строку для вывода
+                                      .Select(x => $"{x.Date,10} \t {x.Time,10} \t {x.Title}");    // Формируем строку для вывода
 
         foreach (var i in a)
         {
@@ -25,7 +25,12 @@ class Program
 
         Console.WriteLine($"\nкол-во пар {CoupleSchedule.Couples.Count()}");
 
-        Console.ReadKey();
+        Console.WriteLine("Press 'q' to stop program and exit...");
+        while (true)
+        {
+            var key = Console.ReadKey();
+            if (key.Key == ConsoleKey.Q) return;
+        }
     }
 
 
