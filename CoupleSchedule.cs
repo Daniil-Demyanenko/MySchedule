@@ -10,6 +10,7 @@ namespace job_checker;
 /// </summary>
 public static class CoupleSchedule
 {
+    private static string _cdir = AppDomain.CurrentDomain.BaseDirectory + "/Cache";
     private static List<ClassInfo> _Couples;
     /// <summary>
     /// Список пар всех институтов
