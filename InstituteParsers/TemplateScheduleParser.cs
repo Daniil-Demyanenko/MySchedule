@@ -1,30 +1,47 @@
 using System;
 using System.Collections.Generic;
+using Aspose.Cells;
 #nullable enable
 
 namespace job_checker.InstituteParsers;
 
+// TODO:
+// Поиск имён преподавателей, регулярка: \b[\w]{4,}\b\s+\w\.\s*\w\.*
+// Поиск номера аудитории, регулярка: \b\d{1,}-{0,1}\d{2,}\w{0,1}
+
 /// <summary>
-/// Парсер для расписаний института ИФМОИОТ
+/// Парсер шаблона ИФМОИОТ
 /// </summary>
-public class IFMOIOTParser : AbstractParser, IDisposable
+public class TemplateScheduleParser : IDisposable
 {
-    //private int _VisibleLinesStartIndex = 38 - 1; // Видимая строка, с которой начинается расписание пар
-    private int _GroupNameRow = 5; // Строка с названиями групп
-
-    // Индекс столбца, с которого начинаются названия групп
-    private int _firstColWithCouple = 3;
-
-    // Позиции групп в расписании не по порядку, скрыты удалённые специализации и т.д. 
+    // Позиции групп в расписании, не по порядку, исключая удалённые специализации и т.д. 
     private List<int>? _GroupNamePositions;
+    private int _GroupNameRow = 5; // Строка с названиями групп
+    private CellPosition _FirstVisibleCell;
+    private Workbook _Workbook;
+    private Worksheet _Sheet;
+    private int _MaxDataCol;
+    private int _MaxDataRow;
 
-    //TODO: заменить числовые константы на DateCol, TimeCol, DayCol, GroupNameRow и т.д.
+    public TemplateScheduleParser(string path)
+    {
+        _Workbook = new Workbook(path);
+        _Sheet = FindPageWithSchedule();
+        _FirstVisibleCell = GetFirstVisibleCell();
+        _MaxDataCol = _Sheet.Cells.MaxDataColumn;
+        _MaxDataRow = _Sheet.Cells.MaxDataRow;
+    }
+    ~TemplateScheduleParser()
+    {
+        this.Dispose();
+    }
+    public void Dispose()
+    {
+        _Sheet.Dispose();
+        _Workbook.Dispose();
+    }
 
-    public IFMOIOTParser(string path) : base(path) { }
-    ~IFMOIOTParser() { base.Dispose(); }
-
-
-    public override List<ClassInfo> Parse()
+    public List<ClassInfo> Parse()
     {
         List<ClassInfo> result = new();
 
@@ -32,23 +49,7 @@ public class IFMOIOTParser : AbstractParser, IDisposable
         var dayPos = GetDaysRowInformation();
 
         foreach (var pos in _GroupNamePositions)
-        {
-            if (pos >= 83)
-                Console.WriteLine();
-
             result.AddRange(GetGroupClasses(pos, dayPos));
-        }
-
-
-
-        foreach (var i in result)
-            Console.WriteLine("{0, -30} {1} \n{2, -2} {3} \n{4, -2} {5}\n\n", i.Date, i.Day, i.Course, i.Group, i.Number, i.Title);
-
-        foreach (var i in _GroupNamePositions)
-            Console.Write($"{i} ");
-
-        Console.WriteLine();
-        Console.WriteLine(_MaxDataCol);
 
         return result;
     }
@@ -65,14 +66,12 @@ public class IFMOIOTParser : AbstractParser, IDisposable
             var cellValue = _Sheet.Cells[i, 0].Value?.ToString()?.Trim();
 
             if (cellValue is not null &&        //Ячейка имеет значение, содержит день недели, не является скрытой
-                IsContainDay(cellValue) &&
-                !_Sheet.Cells.Rows[i].IsHidden
-                )
+                IsContainDayOfWeek(cellValue) &&
+                !_Sheet.Cells.Rows[i].IsHidden)
             {
                 dayPosition.Add(new DayData(pos: i, name: cellValue, date: _Sheet.Cells[i, 1].Value?.ToString()?.Trim()));
             }
         }
-
 
         return dayPosition;
     }
@@ -92,17 +91,14 @@ public class IFMOIOTParser : AbstractParser, IDisposable
             (course, groupName) = SplitGroupNameForMerged(colWithGroup: col);
         else (course, groupName) = SplitGroupName(colWithGroup: col);
 
-
-
         foreach (var day in dayPos)
             for (int i = 0; i < 4; i++)
             {
                 string? className = _Sheet.Cells[day.Pos + i, col].Value?.ToString() ?? null;
                 if (className is null) continue;
 
-                var date = day.Date + " (" + _Sheet.Cells[day.Pos + i, 2].Value.ToString()?.Trim() + ")";
-                var classItem = new ClassInfo(className, date,
-                                    day.Name, cabinet: "", groupName, "ИФМОИОТ", number: i + 1, course);
+                var time = _Sheet.Cells[day.Pos + i, 2].Value.ToString()?.Trim();
+                var classItem = new ClassInfo(className, day.Date, day.Name, time, groupName, course);
                 result.Add(classItem);
             }
 
@@ -117,7 +113,7 @@ public class IFMOIOTParser : AbstractParser, IDisposable
     private (int, string) SplitGroupName(int colWithGroup)
     {
         string[] groupTitle = _Sheet.Cells[_GroupNameRow, colWithGroup].Value.ToString().Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries); // Полное название группы
-        string groupName = String.Join(' ', groupTitle[1..]); // Только название группы
+        string groupName = String.Join(' ', groupTitle[1..]).Trim(); // Только название группы
         int course = int.Parse(groupTitle[0]); // Только курс группы
 
         return (course, groupName);
@@ -151,7 +147,7 @@ public class IFMOIOTParser : AbstractParser, IDisposable
     {
         List<int> result = new();
 
-        for (int i = _firstColWithCouple; i < _MaxDataCol; i++)
+        for (int i = _FirstVisibleCell.Col; i < _MaxDataCol; i++)
         {
             var cellValue = _Sheet.Cells[_GroupNameRow + 1, i].Value?.ToString()?.Trim();
 
@@ -162,4 +158,69 @@ public class IFMOIOTParser : AbstractParser, IDisposable
         return result;
     }
 
+
+    // Возвращает ячейку, с которой начинается само расписание (без шапки, скрытых строк/столбцов)
+    private CellPosition GetFirstVisibleCell()
+    {
+        int colCount = 1000;
+
+        for (int row = 7; row < 1000; row++)
+        {
+            if (_Sheet.Cells.Rows[row].IsHidden) continue;
+            for (int col = 3; col < colCount; col++)
+            {
+                if (_Sheet.Cells.Columns[col].IsHidden) continue;
+                Cell cell = _Sheet.Cells[row, col];
+
+                int visibleRow = row;
+                int visibleCol = col;
+
+                return new CellPosition(visibleCol, visibleRow);
+            }
+        }
+
+        throw new Exception("Bad Exel file");
+    }
+
+
+    // Ищем нужную страницу в файле расписания
+    private Worksheet FindPageWithSchedule()
+    {
+        for (int i = 0; i < _Workbook.Worksheets.Count; i++)
+        {
+            var sheet = _Workbook.Worksheets[i];
+            if (sheet.Cells.MaxDataColumn >= 10 && sheet.Cells.MaxDataRow >= 7) return sheet;
+            sheet.Dispose();
+        }
+        throw new Exception($"Не найдено страницы с расписанием в файле {_Workbook.AbsolutePath}");
+    }
+
+    /// <summary>
+    /// Строка является названием дня недели?
+    /// </summary>
+    public static bool IsContainDayOfWeek(string str)
+    {
+        var days = new string[] { "понедельник", "вторник", "среда", "четверг", "пятница", "суббота" };
+        foreach (var day in days)
+            if (str.Contains(day, StringComparison.InvariantCultureIgnoreCase)) return true;
+
+        return false;
+    }
+
+
+    /// <summary>
+    /// Положение и название дня недели
+    /// </summary>
+    private record DayData
+    {
+        /// <summary>
+        /// Столбец группы
+        /// </summary>
+        public int Pos;
+        public string Name;
+        public string Date;
+        public DayData(int pos, string name, string date) => (Pos, Name, Date) = (pos, name, date);
+
+    }
 }
+
