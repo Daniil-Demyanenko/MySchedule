@@ -23,7 +23,7 @@ public static class CoupleSchedule
     /// </summary>
     public static void Update()
     {
-        using var IFMOIOT = new IFMOIOTParser(AppDomain.CurrentDomain.BaseDirectory + "/ras.xls");
+        using var IFMOIOT = new TemplateScheduleParser(AppDomain.CurrentDomain.BaseDirectory + "/ras.xls");
         _Couples = IFMOIOT.Parse();
     }
 

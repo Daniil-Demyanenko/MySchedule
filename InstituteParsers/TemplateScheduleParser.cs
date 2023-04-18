@@ -12,7 +12,7 @@ namespace job_checker.InstituteParsers;
 /// <summary>
 /// Парсер шаблона ИФМОИОТ
 /// </summary>
-public class AbstractParser : IDisposable
+public class TemplateScheduleParser : IDisposable
 {
     // Позиции групп в расписании, не по порядку, исключая удалённые специализации и т.д. 
     private List<int>? _GroupNamePositions;
@@ -23,7 +23,7 @@ public class AbstractParser : IDisposable
     private int _MaxDataCol;
     private int _MaxDataRow;
 
-    public AbstractParser(string path)
+    public TemplateScheduleParser(string path)
     {
         _Workbook = new Workbook(path);
         _Sheet = FindPageWithSchedule();
@@ -31,7 +31,7 @@ public class AbstractParser : IDisposable
         _MaxDataCol = _Sheet.Cells.MaxDataColumn;
         _MaxDataRow = _Sheet.Cells.MaxDataRow;
     }
-    ~AbstractParser()
+    ~TemplateScheduleParser()
     {
         this.Dispose();
     }
