@@ -7,10 +7,9 @@ class Program
 {
     static void Main(string[] args)
     {
-        TelegramBot bot = new TelegramBot(args[0]);
         CoupleSchedule.Update();
         // SetUpdateScheduleTimer(); //Запускаем таймер, проверяющий обновление расписаний каждые 4 часа
-        bot.WaitMessages();
+        TelegramBot.Start(args[0]);
 
 
         //////////////// Вывод спаршеных групп, перед релизом удалить ////////////////
