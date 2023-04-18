@@ -44,7 +44,7 @@ namespace job_checker
             (string name, string link) = GetDirectLinkAsync(ParseLinkFromPage()).Result;
             Console.WriteLine($"{name}\n{link}");
             string extension = name.Split('.')[^1]; // получаем расширение файла (xls или xlsx)
-            string filePath = _cdir + "/ИФМОИОТ_ОФО." + extension; // генерируем имя скачанного файла
+            string filePath = _cdir + "/ИФМОИОТ_ОФО_БАК." + extension; // генерируем имя скачанного файла
             DownloadFromDirectLinkAsync(link, filePath).Wait(); // ждём окончания загрузки
             Console.WriteLine($"Файл успешно скачан по пути {filePath}");
 
@@ -88,6 +88,11 @@ namespace job_checker
             return result;
         }
 
+/// <summary>
+/// lkbnjk
+/// </summary>
+/// <param name="url"></param>
+/// <returns>ytdty</returns>
         static async Task<(string, string)> GetDirectLinkAsync(string url)
         {
             using var request = new HttpRequestMessage(HttpMethod.Get, $"https://cloud-api.yandex.net/v1/disk/public/resources?public_key={url}");

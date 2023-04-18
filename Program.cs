@@ -7,7 +7,7 @@ class Program
     static void Main(string[] args)
     {
         CoupleSchedule.Update();
-        ScheduleDownloader.CheckUpdate();
+        //ScheduleDownloader.CheckUpdate();
         Console.ReadKey();
     }
 }
