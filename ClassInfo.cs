@@ -22,7 +22,7 @@ public record ClassInfo
     /// <summary>
     /// Полная дата
     /// </summary>
-    public string Date { get; init; }
+    public DateTime Date { get; init; }
     /// <summary>
     /// Название группы
     /// </summary>
@@ -38,6 +38,6 @@ public record ClassInfo
 
 
 
-    public ClassInfo(string title, string date, string day, string time, string group, int course) =>
+    public ClassInfo(string title, DateTime date, string day, string time, string group, int course) =>
         (Title, Date, Day, Time, Group, Course) = (title, date, day, time, group, course);
 }

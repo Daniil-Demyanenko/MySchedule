@@ -8,14 +8,14 @@ class Program
     static void Main(string[] args)
     {
         CoupleSchedule.Update();
-        // SetUpdateScheduleTimer(); //Запускаем таймер, проверяющий обновление расписаний каждые 4 часа
+        // SetUpdateScheduleTimer(); //Запускаем таймер, проверяющий обновление расписаний каждые 6 часов
         TelegramBot.Start(args[0]);
 
 
         //////////////// Вывод спаршеных групп, перед релизом удалить ////////////////
         //var a = CoupleSchedule.Couples.Select(x => x.Course + " " + x.Group).Distinct();
         var a = CoupleSchedule.Couples.Where(x => x.Course == 3 && x.Group.ToLower() == "по (инф)") // Выбираем пары у конкретной группы
-                                      .Select(x => $"{x.Date,10} \t {x.Time,10} \t {x.Title}");    // Формируем строку для вывода
+                                      .Select(x => $"{x.Date.ToString("d"),10} \t {x.Time,10} \t {x.Title}");    // Формируем строку для вывода
 
         foreach (var i in a)
         {
@@ -35,7 +35,7 @@ class Program
 
     static void SetUpdateScheduleTimer()
     {
-        var UpdateInterval = new TimeSpan(hours: 4, minutes: 0, seconds: 0);
+        var UpdateInterval = new TimeSpan(hours: 6, minutes: 5, seconds: 0);
         var UpdateTimer = new Timer(UpdateInterval);
         UpdateTimer.Elapsed += (s, e) => ScheduleDownloader.CheckUpdate();
         UpdateTimer.AutoReset = true;
