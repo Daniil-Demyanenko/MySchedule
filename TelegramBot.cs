@@ -8,16 +8,16 @@ namespace job_checker
     /// <summary>
     /// Класс, отвечающий за взаимодействие с пользователем
     /// </summary>
-    public class TelegramBot
+    public static class TelegramBot
     {
-        private string _token;
+        private static string _token;
         
-        public TelegramBot(string token)
+        public static void Start(string token)
         {
             _token = token;
         }
 
-        public void WaitMessages()
+        public static void WaitMessages()
         {
 
         }
