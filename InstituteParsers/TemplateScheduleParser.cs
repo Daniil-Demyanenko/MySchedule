@@ -16,13 +16,13 @@ namespace job_checker.InstituteParsers;
 public class TemplateScheduleParser : IDisposable
 {
     // Позиции групп в расписании, не по порядку, исключая удалённые специализации и т.д. 
-    private List<int>? _GroupNamePositions;
-    private int _GroupNameRow = 5; // Строка с названиями групп
-    private CellPosition _FirstVisibleCell;
-    private Workbook _Workbook;
-    private Worksheet _Sheet;
-    private int _MaxDataCol;
-    private int _MaxDataRow;
+    protected List<int>? _GroupNamePositions;
+    protected int _GroupNameRow = 5; // Строка с названиями групп
+    protected CellPosition _FirstVisibleCell;
+    protected Workbook _Workbook;
+    protected Worksheet _Sheet;
+    protected int _MaxDataCol;
+    protected int _MaxDataRow;
 
     public TemplateScheduleParser(string path)
     {
@@ -58,7 +58,7 @@ public class TemplateScheduleParser : IDisposable
     /// <summary>
     /// Возвращает позиции столбцов с названиями групп
     /// </summary>
-    private List<int> GetGroupNamePositions()
+    protected virtual List<int> GetGroupNamePositions()
     {
         List<int> result = new();
 
@@ -76,7 +76,7 @@ public class TemplateScheduleParser : IDisposable
     /// <summary>
     /// Возвращает информацию о не скрытых днях недели в расписании
     /// </summary>
-    private List<DayData> GetDaysRowInformation()
+    protected List<DayData> GetDaysRowInformation()
     {
         List<DayData> dayPosition = new();
 
@@ -103,7 +103,7 @@ public class TemplateScheduleParser : IDisposable
     /// </summary>
     /// <param name="col">колонка с группой</param>
     /// <param name="dayPos">Позиции дней недели</param>
-    private List<ClassInfo> GetGroupClasses(int col, List<DayData> dayPos)
+    protected virtual List<ClassInfo> GetGroupClasses(int col, List<DayData> dayPos)
     {
         var result = new List<ClassInfo>();
         int course;
@@ -132,7 +132,7 @@ public class TemplateScheduleParser : IDisposable
     /// </summary>
     /// <param name="colWithGroup">индекс колонки с названием группы</param>
     /// <returns>(Курс, Направление подготовки)</returns>
-    private (int, string) SplitGroupName(int colWithGroup)
+    protected (int, string) SplitGroupName(int colWithGroup)
     {
         string[] groupTitle = _Sheet.Cells[_GroupNameRow, colWithGroup].Value.ToString().Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries); // Полное название группы
         string groupName = String.Join(' ', groupTitle[1..]).Trim(); // Только название группы
@@ -147,7 +147,7 @@ public class TemplateScheduleParser : IDisposable
     /// </summary>
     /// <param name="colWithGroup">индекс колонки с названием группы</param>
     /// <returns>(Курс, Направление подготовки)</returns>
-    private (int, string) SplitGroupNameForMerged(int colWithGroup)
+    protected (int, string) SplitGroupNameForMerged(int colWithGroup)
     {
         bool isSecondCell = _Sheet.Cells[_GroupNameRow, colWithGroup].Value == null; // Является второй ячейкай в объединении?
 
@@ -164,7 +164,7 @@ public class TemplateScheduleParser : IDisposable
 
 
     // Возвращает ячейку, с которой начинается само расписание (без шапки, скрытых строк/столбцов)
-    private CellPosition GetFirstVisibleCell()
+    protected CellPosition GetFirstVisibleCell()
     {
         int colCount = 1000;
 
@@ -188,7 +188,7 @@ public class TemplateScheduleParser : IDisposable
 
 
     // Ищем нужную страницу в файле расписания
-    private Worksheet FindPageWithSchedule()
+    protected Worksheet FindPageWithSchedule()
     {
         for (int i = 0; i < _Workbook.Worksheets.Count; i++)
         {
@@ -215,7 +215,7 @@ public class TemplateScheduleParser : IDisposable
     /// <summary>
     /// Положение и название дня недели
     /// </summary>
-    private record DayData
+    protected record DayData
     {
         /// <summary>
         /// Столбец группы
