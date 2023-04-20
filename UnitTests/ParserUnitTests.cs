@@ -83,9 +83,24 @@ namespace job_checker.UnitTests
         {
             var couples = GetCouples(_OFOMAG);
             var POMII1 = couples.Where(x => x.Course == 1 && x.Group == "маг ПО (ТО) []");
-            var a = couples.Select(x => x.Group).Distinct();
 
-            foreach (var i in a) Console.WriteLine(i);
+            Assert.Equal(18, POMII1.Count());
+        }
+
+        [Fact]
+        public void ParsingTestZFOMAG_GroupCount()
+        {
+            var couples = GetZFOCouples(_ZFOMAG);
+            var groups = couples.Select(x => x.Course + " " + x.Group).Distinct();
+
+            Assert.Equal(4, groups.Count());
+        }
+
+        [Fact]
+        public void ParsingTestZFOMAG_CoupleCount()
+        {
+            var couples = GetZFOCouples(_ZFOMAG);
+            var POMII1 = couples.Where(x => x.Course == 1 && x.Group == "маг ПО (ПТ)");
 
             Assert.Equal(18, POMII1.Count());
         }
@@ -93,6 +108,11 @@ namespace job_checker.UnitTests
         public static List<ClassInfo> GetCouples(string path)
         {
             using var IFMOIOT = new TemplateScheduleParser(path);
+            return IFMOIOT.Parse();
+        }
+        public static List<ClassInfo> GetZFOCouples(string path)
+        {
+            using var IFMOIOT = new ZFOParser(path);
             return IFMOIOT.Parse();
         }
     }
