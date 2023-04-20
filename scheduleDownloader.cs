@@ -85,7 +85,7 @@ namespace job_checker
         {
             var result = "";
             var request = (HttpWebRequest)WebRequest.Create(url);
-            var response = (HttpWebResponse)request.GetResponse();
+            using var response = (HttpWebResponse)request.GetResponse();
 
             if (response.StatusCode == HttpStatusCode.OK)
             {
