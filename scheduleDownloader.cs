@@ -12,13 +12,18 @@ namespace job_checker
     public static class ScheduleDownloader
     {
         private static readonly HttpClient _client = new HttpClient();
-        private static string _dir = AppDomain.CurrentDomain.BaseDirectory; //Путь к директории программы
         private static string _cdir = AppDomain.CurrentDomain.BaseDirectory + "/Cache"; //Путь к папке Cache в директории программы
         public static void CheckUpdate()
         {
             if (!CacheIsRelevant()) Download();
         }
 
+        /// <summary>
+        /// Проверяем релевантность кэша, путём проверки существования папки Cache, в которой он должен храниться, 
+        /// наличия файлов в этой папке, 
+        /// и последнего времени записи файлов расписания
+        /// </summary>
+    
         private static bool CacheIsRelevant()
         {
 
@@ -28,13 +33,15 @@ namespace job_checker
                 return false;
             }
 
-            if (!File.Exists(_cdir + "/ras.xls"))
+            string[] dirFiles = Directory.GetFileSystemEntries(_cdir);
+
+            if (dirFiles.Length == 0)
             {
                 return false;
             }
 
-            var fileWriteDate = File.GetLastWriteTime(_cdir + "/ras.xls");
-            if ((DateTime.Now - fileWriteDate).TotalHours > 6) return false;
+            // var fileWriteDate = File.GetLastWriteTime(_cdir + "/ras.xls");
+            // if ((DateTime.Now - fileWriteDate).TotalHours > 4) return false;
 
             return true;
 
@@ -67,7 +74,7 @@ namespace job_checker
         {
             var result = "";
             var request = (HttpWebRequest)WebRequest.Create(url);
-            var response = (HttpWebResponse)request.GetResponse();
+            using var response = (HttpWebResponse)request.GetResponse();
 
             if (response.StatusCode == HttpStatusCode.OK)
             {
@@ -88,11 +95,6 @@ namespace job_checker
             return result;
         }
 
-/// <summary>
-/// lkbnjk
-/// </summary>
-/// <param name="url"></param>
-/// <returns>ytdty</returns>
         static async Task<(string, string)> GetDirectLinkAsync(string url)
         {
             using var request = new HttpRequestMessage(HttpMethod.Get, $"https://cloud-api.yandex.net/v1/disk/public/resources?public_key={url}");

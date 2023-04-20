@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using Aspose.Cells;
 #nullable enable
 
@@ -55,6 +56,24 @@ public class TemplateScheduleParser : IDisposable
     }
 
     /// <summary>
+    /// Возвращает позиции столбцов с названиями групп
+    /// </summary>
+    private List<int> GetGroupNamePositions()
+    {
+        List<int> result = new();
+
+        for (int i = _FirstVisibleCell.Col; i < _MaxDataCol; i++)
+        {
+            var cellValue = _Sheet.Cells[_GroupNameRow + 1, i].Value?.ToString()?.Trim();
+
+            if (cellValue is not null && !_Sheet.Cells.Columns[i].IsHidden)       //Ячейка имеет значение, не является скрытой
+                result.Add(i);
+        }
+
+        return result;
+    }
+
+    /// <summary>
     /// Возвращает информацию о не скрытых днях недели в расписании
     /// </summary>
     private List<DayData> GetDaysRowInformation()
@@ -69,7 +88,10 @@ public class TemplateScheduleParser : IDisposable
                 IsContainDayOfWeek(cellValue) &&
                 !_Sheet.Cells.Rows[i].IsHidden)
             {
-                dayPosition.Add(new DayData(pos: i, name: cellValue, date: _Sheet.Cells[i, 1].Value?.ToString()?.Trim()));
+                CultureInfo culture = new("ru-RU");
+                string dateStr = _Sheet.Cells[i, 1].Value?.ToString()?.Trim();
+                DateTime date = DateTime.Parse(dateStr, culture);
+                dayPosition.Add(new DayData(pos: i, name: cellValue, date: date));
             }
         }
 
@@ -140,24 +162,6 @@ public class TemplateScheduleParser : IDisposable
         return (course, groupName);
     }
 
-    /// <summary>
-    /// Возвращает позиции столбцов с названиями групп
-    /// </summary>
-    private List<int> GetGroupNamePositions()
-    {
-        List<int> result = new();
-
-        for (int i = _FirstVisibleCell.Col; i < _MaxDataCol; i++)
-        {
-            var cellValue = _Sheet.Cells[_GroupNameRow + 1, i].Value?.ToString()?.Trim();
-
-            if (cellValue is not null && !_Sheet.Cells.Columns[i].IsHidden)       //Ячейка имеет значение, не является скрытой
-                result.Add(i);
-        }
-
-        return result;
-    }
-
 
     // Возвращает ячейку, с которой начинается само расписание (без шапки, скрытых строк/столбцов)
     private CellPosition GetFirstVisibleCell()
@@ -218,8 +222,8 @@ public class TemplateScheduleParser : IDisposable
         /// </summary>
         public int Pos;
         public string Name;
-        public string Date;
-        public DayData(int pos, string name, string date) => (Pos, Name, Date) = (pos, name, date);
+        public DateTime Date;
+        public DayData(int pos, string name, DateTime date) => (Pos, Name, Date) = (pos, name, date);
 
     }
 }

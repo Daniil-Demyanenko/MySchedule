@@ -7,11 +7,10 @@ class Program
 {
     static void Main(string[] args)
     {
-        CoupleSchedule.Update();
-        // SetUpdateScheduleTimer(); //Запускаем таймер, проверяющий обновление расписаний каждые 4 часа
         TelegramBot.Start(args[0]);
+        SetUpdateScheduleTimer(); //Запускаем таймер, проверяющий обновление расписаний каждые 4 часа
 
-
+        CoupleSchedule.Update();
         //////////////// Вывод спаршеных групп, перед релизом удалить ////////////////
         //var a = CoupleSchedule.Couples.Select(x => x.Course + " " + x.Group).Distinct();
         var a = CoupleSchedule.Couples.Where(x => x.Course == 3 && x.Group.ToLower() == "по (инф)") // Выбираем пары у конкретной группы
