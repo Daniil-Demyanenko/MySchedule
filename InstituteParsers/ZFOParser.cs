@@ -23,7 +23,7 @@ public class ZFOParser : TemplateScheduleParser, IDisposable
 
             if (cellValue is not null && !_Sheet.Cells.Columns[i].IsHidden)       //Ячейка имеет значение, не является скрытой
             {
-                if(_Sheet.Cells[_GroupNameRow, i].Value?.ToString().Trim() == "группа") break;
+                if (_Sheet.Cells[_GroupNameRow, i].Value?.ToString().Trim() == "группа") break;
                 result.Add(i);
             }
         }
@@ -47,7 +47,9 @@ public class ZFOParser : TemplateScheduleParser, IDisposable
         else (course, groupName) = SplitGroupName(colWithGroup: col);
 
         foreach (var day in dayPos)
-            for (int i = 0; i < 3; i++)
+        {
+            int ClassesCountOfDay = _Sheet.Cells[day.Pos, 0].GetMergedRange().RowCount;
+            for (int i = 0; i < ClassesCountOfDay; i++)
             {
                 string? className = _Sheet.Cells[day.Pos + i, col].Value?.ToString() ?? null;
                 if (className is null) continue;
@@ -56,6 +58,7 @@ public class ZFOParser : TemplateScheduleParser, IDisposable
                 var classItem = new ClassInfo(className, day.Date, day.Name, time, groupName, course);
                 result.Add(classItem);
             }
+        }
 
         return result;
     }

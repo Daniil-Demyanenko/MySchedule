@@ -67,7 +67,10 @@ public class TemplateScheduleParser : IDisposable
             var cellValue = _Sheet.Cells[_GroupNameRow + 1, i].Value?.ToString()?.Trim();
 
             if (cellValue is not null && !_Sheet.Cells.Columns[i].IsHidden)       //Ячейка имеет значение, не является скрытой
+            {
+                if (_Sheet.Cells[_GroupNameRow, i].Value?.ToString().Trim() == "группа") break;
                 result.Add(i);
+            }
         }
 
         return result;
@@ -114,7 +117,9 @@ public class TemplateScheduleParser : IDisposable
         else (course, groupName) = SplitGroupName(colWithGroup: col);
 
         foreach (var day in dayPos)
-            for (int i = 0; i < 4; i++)
+        {
+            int ClassesCountOfDay = _Sheet.Cells[day.Pos, 0].GetMergedRange().RowCount;
+            for (int i = 0; i < ClassesCountOfDay; i++)
             {
                 string? className = _Sheet.Cells[day.Pos + i, col].Value?.ToString() ?? null;
                 if (className is null) continue;
@@ -123,6 +128,7 @@ public class TemplateScheduleParser : IDisposable
                 var classItem = new ClassInfo(className, day.Date, day.Name, time, groupName, course);
                 result.Add(classItem);
             }
+        }
 
         return result;
     }

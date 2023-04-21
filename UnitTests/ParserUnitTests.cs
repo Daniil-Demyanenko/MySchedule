@@ -100,10 +100,28 @@ namespace job_checker.UnitTests
         public void ParsingTestZFOMAG_CoupleCount()
         {
             var couples = GetZFOCouples(_ZFOMAG);
-            var POMII1 = couples.Where(x => x.Course == 1 && x.Group == "маг ПО (ПТ)");
+            var POPT1 = couples.Where(x => x.Course == 1 && x.Group == "маг ПО (ПТ)");
 
-            Assert.Equal(18, POMII1.Count());
+            Assert.Equal(18, POPT1.Count());
         }
+
+        // [Fact]
+        // public void ParsingTestZFOBAK_GroupCount()
+        // {
+        //     var couples = GetZFOCouples(_ZFOBAK);
+        //     var groups = couples.Select(x => x.Course + " " + x.Group).Distinct();
+
+        //     Assert.Equal(11, groups.Count());
+        // }
+
+        // [Fact]
+        // public void ParsingTestZFOBAK_CoupleCount()
+        // {
+        //     var couples = GetZFOCouples("UnitTests/TESTSDATA/ZFOBAK.xls");
+        //     var POPT1 = couples.Where(x => x.Course == 3 && x.Group == "ПО (ТО)");
+
+        //     Assert.Equal(25, POPT1.Count());
+        // }
 
         public static List<ClassInfo> GetCouples(string path)
         {
