@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using HtmlAgilityPack;
 using Newtonsoft.Json;
 using System.Text;
+using System.Collections.Generic;
 
 namespace job_checker
 {
@@ -13,17 +14,12 @@ namespace job_checker
     {
         private static readonly HttpClient _client = new HttpClient();
         private static string _cdir = AppDomain.CurrentDomain.BaseDirectory + "/Cache"; //Путь к папке Cache в директории программы
+        private static string[] _sceduleNames = { "/ИФМОИОТ_ОФО_БАК.", "/ИФМОИОТ_ЗФО_БАК.", "/ИФМОИОТ_ОФО_МАГ.", "/ИФМОИОТ_ЗФО_МАГ." };
         public static void CheckUpdate()
         {
             if (!CacheIsRelevant()) Download();
         }
 
-        /// <summary>
-        /// Проверяем релевантность кэша, путём проверки существования папки Cache, в которой он должен храниться, 
-        /// наличия файлов в этой папке, 
-        /// и последнего времени записи файлов расписания
-        /// </summary>
-    
         private static bool CacheIsRelevant()
         {
 
@@ -40,34 +36,49 @@ namespace job_checker
                 return false;
             }
 
-            // var fileWriteDate = File.GetLastWriteTime(_cdir + "/ras.xls");
-            // if ((DateTime.Now - fileWriteDate).TotalHours > 4) return false;
+            for (int i = 0; i < dirFiles.Length; i++)
+            {
+                var fileWriteDate = File.GetLastWriteTime(dirFiles[i]);
+                if ((DateTime.Now - fileWriteDate).TotalHours > 4) return false;
+            }
 
             return true;
 
         }
+
         private static void Download()
         {
-            (string name, string link) = GetDirectLinkAsync(ParseLinkFromPage()).Result;
-            Console.WriteLine($"{name}\n{link}");
-            string extension = name.Split('.')[^1]; // получаем расширение файла (xls или xlsx)
-            string filePath = _cdir + "/ИФМОИОТ_ОФО_БАК." + extension; // генерируем имя скачанного файла
-            DownloadFromDirectLinkAsync(link, filePath).Wait(); // ждём окончания загрузки
-            Console.WriteLine($"Файл успешно скачан по пути {filePath}");
+            var parsedLinks = ParseLinkFromPage();
+            foreach (var item in parsedLinks)
+            {
+                (string name, string link) = GetDirectLinkAsync(item.Item2).Result;
+                Console.WriteLine($"{name}\n{link}");
+                string extension = name.Split('.')[^1]; // получаем расширение файла (xls или xlsx)
+                string filePath = _cdir + item.Item1 + extension; // генерируем имя скачанного файла
+                DownloadFromDirectLinkAsync(link, filePath).Wait(); // ждём окончания загрузки
+            }
 
             Console.ReadKey();
         }
-        private static string ParseLinkFromPage()
+        private static List<(string, string)> ParseLinkFromPage()
         {
             var link = LoadPage(@"https://lgpu.org/elektronnyy-resurs-distancionnogo-obucheniya-ifmit.html");
             var document = new HtmlDocument();
             document.LoadHtml(link);
+            List<(string, string)> links = new();
+            for (int i = 0; i < 4; i++) //Перебираем со 2 по 5 ячейку в таблице расписаний
+            {
+                HtmlNodeCollection xpathLink = document.DocumentNode.SelectNodes($"//tr[3]/td[{i + 2}]/p/a");
+                if (xpathLink != null)
+                {
+                    links.Add((_sceduleNames[i], xpathLink[0].GetAttributeValue("href", "")));
+                    continue;
+                }
 
-            HtmlNodeCollection xpathLink = document.DocumentNode.SelectNodes("//tr[3]/td[2]/p/a");
-            var diskLink = "";
-            diskLink = xpathLink[0].GetAttributeValue("href", "");
+            }
 
-            return diskLink;
+            return links;
+
         }
 
         private static string LoadPage(string url) //Тут происходит какая то чёрная магия, в которой я не разобрался. Оно работает - и хуй с ним
@@ -106,7 +117,7 @@ namespace job_checker
         private static async Task DownloadFromDirectLinkAsync(string url, string path)
         {
             using WebClient webClient = new WebClient();
-            await webClient.DownloadFileTaskAsync(new Uri(url), path); // если директория не существует то ее надо создать заранее
+            await webClient.DownloadFileTaskAsync(new Uri(url), path);
         }
     }
 }
