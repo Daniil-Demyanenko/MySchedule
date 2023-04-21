@@ -14,6 +14,12 @@ namespace job_checker.UnitTests
         static string _OFOMAG = "../../../UnitTests/TESTSDATA/OFOMAG.xlsx";
         static string _ZFOBAK = "../../../UnitTests/TESTSDATA/ZFOBAK.xls";
         static string _ZFOMAG = "../../../UnitTests/TESTSDATA/ZFOMAG.xls";
+        // static string _OFOBAK1 = "UnitTests/TESTSDATA/OFOBAK1.xlsx";
+        // static string _OFOBAK2 = "UnitTests/TESTSDATA/OFOBAK2.xlsx";
+        // static string _OFOBAK3 = "UnitTests/TESTSDATA/OFOBAK3.xlsx";
+        // static string _OFOMAG = "UnitTests/TESTSDATA/OFOMAG.xlsx";
+        // static string _ZFOBAK = "UnitTests/TESTSDATA/ZFOBAK.xls";
+        // static string _ZFOMAG = "UnitTests/TESTSDATA/ZFOMAG.xls";
 
         [Fact]
         public void ParsingTestOFOBAK1_GroupCount()
@@ -75,7 +81,8 @@ namespace job_checker.UnitTests
             var couples = GetCouples(_OFOMAG);
             var groups = couples.Select(x => x.Course + " " + x.Group).Distinct();
 
-            Assert.Equal(17, groups.Count());
+            int count = groups.Count();
+            Assert.Equal(17, count);
         }
 
         [Fact]
@@ -84,22 +91,24 @@ namespace job_checker.UnitTests
             var couples = GetCouples(_OFOMAG);
             var POMII1 = couples.Where(x => x.Course == 1 && x.Group == "маг ПО (ТО) []");
 
-            Assert.Equal(18, POMII1.Count());
+            int count = POMII1.Count();
+            Assert.Equal(18, count);
         }
 
         [Fact]
         public void ParsingTestZFOMAG_GroupCount()
         {
-            var couples = GetZFOCouples(_ZFOMAG);
+            var couples = GetCouples(_ZFOMAG);
             var groups = couples.Select(x => x.Course + " " + x.Group).Distinct();
 
-            Assert.Equal(4, groups.Count());
+            int count = groups.Count();
+            Assert.Equal(4, count);
         }
 
         [Fact]
         public void ParsingTestZFOMAG_CoupleCount()
         {
-            var couples = GetZFOCouples(_ZFOMAG);
+            var couples = GetCouples(_ZFOMAG);
             var POPT1 = couples.Where(x => x.Course == 1 && x.Group == "маг ПО (ПТ)");
 
             Assert.Equal(18, POPT1.Count());
@@ -126,11 +135,6 @@ namespace job_checker.UnitTests
         public static List<ClassInfo> GetCouples(string path)
         {
             using var IFMOIOT = new TemplateScheduleParser(path);
-            return IFMOIOT.Parse();
-        }
-        public static List<ClassInfo> GetZFOCouples(string path)
-        {
-            using var IFMOIOT = new ZFOParser(path);
             return IFMOIOT.Parse();
         }
     }
