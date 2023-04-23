@@ -8,7 +8,6 @@ class Program
     static void Main(string[] args)
     {
         TelegramBot.Start(args[0]);
-        ScheduleDownloader.CheckUpdate();
         SetUpdateScheduleTimer(); //Запускаем таймер, проверяющий обновление расписаний каждые 4 часа
         CoupleSchedule.Update();
 
@@ -47,11 +46,14 @@ class Program
 
     static void SetUpdateScheduleTimer() //TODO: разобраться с запуском таймера при старте проги
     {
+        ScheduleDownloader.CheckUpdate();
+        
         var UpdateInterval = new TimeSpan(hours: 4, minutes: 5, seconds: 0);
         var UpdateTimer = new Timer(UpdateInterval);
         UpdateTimer.Elapsed += (s, e) => ScheduleDownloader.CheckUpdate();
         UpdateTimer.AutoReset = true;
         UpdateTimer.Enabled = true;
+        UpdateTimer.Start();
     }
 }
 
