@@ -8,13 +8,6 @@ namespace job_checker.UnitTests;
 
 public class ParserCouplesUnitTests
 {
-    // static string _OFOBAK1 = "UnitTests/TESTSDATA/OFOBAK1.xlsx";
-    // static string _OFOBAK2 = "UnitTests/TESTSDATA/OFOBAK2.xlsx";
-    // static string _OFOBAK3 = "UnitTests/TESTSDATA/OFOBAK3.xlsx";
-    // static string _OFOMAG = "UnitTests/TESTSDATA/OFOMAG.xlsx";
-    // static string _ZFOBAK = "UnitTests/TESTSDATA/ZFOBAK.xls";
-    // static string _ZFOMAG = "UnitTests/TESTSDATA/ZFOMAG.xls";
-
     [Fact]
     public void ParsingTestOFOBAK1_GroupCount()
     {
