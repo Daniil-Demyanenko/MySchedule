@@ -22,19 +22,7 @@ class Program
         // }
 
         Console.WriteLine($"\nкол-во пар {CoupleSchedule.Couples.Count()}");
-        // var tmp = new UnitTests.ParserUnitTests();
-        // tmp.ParsingTestOFOBAK1_CoupleCount();
-        // tmp.ParsingTestOFOBAK1_GroupCount();
-        // tmp.ParsingTestOFOBAK2_CoupleCount();
-        // tmp.ParsingTestOFOBAK2_GroupCount();
-        // tmp.ParsingTestOFOBAK3_CoupleCount();
-        // tmp.ParsingTestOFOBAK3_GroupCount();
-        // tmp.ParsingTestOFOMAG_CoupleCount();
-        // tmp.ParsingTestOFOMAG_GroupCount();
-        // tmp.ParsingTestZFOMAG_CoupleCount();
-        // tmp.ParsingTestZFOMAG_GroupCount();
     
-
         Console.WriteLine("Press 'q' to stop program and exit...");
         while (true)
         {
