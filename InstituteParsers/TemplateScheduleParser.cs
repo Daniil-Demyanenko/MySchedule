@@ -15,6 +15,9 @@ namespace job_checker.InstituteParsers;
 /// </summary>
 public class TemplateScheduleParser : IDisposable
 {
+    public List<StudyGroup> StudyGroups;
+
+
     // Позиции групп в расписании, не по порядку, исключая удалённые специализации и т.д. 
     protected List<int>? _GroupNamePositions;
     protected int _GroupNameRow = 5; // Строка с названиями групп
@@ -51,6 +54,22 @@ public class TemplateScheduleParser : IDisposable
 
         foreach (var pos in _GroupNamePositions)
             result.AddRange(GetGroupClasses(pos, dayPos));
+
+        StudyGroups = GetStudyGroups(_GroupNamePositions);
+
+        return result;
+    }
+
+    private List<StudyGroup> GetStudyGroups(List<int> groupsPos)
+    {
+        List<StudyGroup> result = new();
+
+        foreach (var pos in groupsPos)
+        {
+            var (course, groupName) = SplitGroupNameForMergedCellsOrNot(colWithGroup: pos);
+
+            result.Add(new StudyGroup(course, groupName));
+        }
 
         return result;
     }
@@ -112,9 +131,7 @@ public class TemplateScheduleParser : IDisposable
         int course;
         string groupName;
 
-        if (_Sheet.Cells[_GroupNameRow, col].IsMerged)
-            (course, groupName) = SplitGroupNameForMerged(colWithGroup: col);
-        else (course, groupName) = SplitGroupName(colWithGroup: col);
+        (course, groupName) = SplitGroupNameForMergedCellsOrNot(colWithGroup: col);
 
         foreach (var day in dayPos)
         {
@@ -217,6 +234,24 @@ public class TemplateScheduleParser : IDisposable
             if (str.Contains(day, StringComparison.InvariantCultureIgnoreCase)) return true;
 
         return false;
+    }
+
+    /// <summary>
+    /// Разделяет название группы на Курс и Направление подготовки.
+    /// Добавляет уточнение для объеденённых групп в название
+    /// </summary>
+    /// <param name="colWithGroup">индекс колонки с названием группы</param>
+    /// <returns>(Курс, Направление подготовки)</returns>
+    private (int, string) SplitGroupNameForMergedCellsOrNot(int colWithGroup)
+    {
+        int course;
+        string groupName;
+
+        if (_Sheet.Cells[_GroupNameRow, colWithGroup].IsMerged)
+            (course, groupName) = SplitGroupNameForMerged(colWithGroup);
+        else (course, groupName) = SplitGroupName(colWithGroup);
+
+        return (course, groupName);
     }
 
 

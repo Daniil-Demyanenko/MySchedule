@@ -10,13 +10,19 @@ namespace job_checker;
 /// </summary>
 public static class CoupleSchedule
 {
-    private static string _cdir = AppDomain.CurrentDomain.BaseDirectory + "/Cache";
-    private static List<ClassInfo> _Couples;
     /// <summary>
     /// Список пар всех институтов
     /// </summary>
-    /// <value></value>
     public static IEnumerable<ClassInfo> Couples => _Couples;
+    /// <summary>
+    /// Список всех учебных групп
+    /// </summary>
+    public static IEnumerable<StudyGroup> StudyGroups => _StudyGroups;
+
+    private static string _cdir = AppDomain.CurrentDomain.BaseDirectory + "/Cache";
+    private static List<StudyGroup> _StudyGroups;
+    private static List<ClassInfo> _Couples;
+
 
 
     /// <summary>
@@ -26,6 +32,7 @@ public static class CoupleSchedule
     {
         using var IFMOIOT = new TemplateScheduleParser(AppDomain.CurrentDomain.BaseDirectory + "/ras.xls");
         _Couples = IFMOIOT.Parse();
+        _StudyGroups = IFMOIOT.StudyGroups;
     }
 
 }
