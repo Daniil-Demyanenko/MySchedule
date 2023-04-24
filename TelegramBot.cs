@@ -19,9 +19,9 @@ namespace job_checker
         private static Dictionary<ChatId, TelegramUser> _Users = new();
         public static void Start(string token)
         {
-            var client = new TelegramBotClient(token);
+            var TBClient = new TelegramBotClient(token);
 
-            client.StartReceiving(HandleUpdate, HandleError);
+            TBClient.StartReceiving(HandleUpdate, HandleError);
 
 
 
@@ -57,17 +57,35 @@ namespace job_checker
 
             if (update.Type == Telegram.Bot.Types.Enums.UpdateType.CallbackQuery)
             {
-                // update.CallbackQuery.Data;
+                var a = update.CallbackQuery.Data;
+                switch (a)
+                {
+                    case "1":
+                        await TBClient.SendTextMessageAsync(update.CallbackQuery.Message.Chat.Id, "Выбран 1 курс");
+                        break;
+                    case "2":
+                        await TBClient.SendTextMessageAsync(update.CallbackQuery.Message.Chat.Id, "Выбран 2 курс");
+                        break;
+                    case "3":
+                        await TBClient.SendTextMessageAsync(update.CallbackQuery.Message.Chat.Id, "Выбран 3 курс");
+                        break;
+                    case "4":
+                        await TBClient.SendTextMessageAsync(update.CallbackQuery.Message.Chat.Id, "Выбран 4 курс");
+                        break;
+                    case "5":
+                        await TBClient.SendTextMessageAsync(update.CallbackQuery.Message.Chat.Id, "Выбран 5 курс");
+                        break;
+                }
             }
         }
+    }
 
-        private record TelegramUser
-        {
-            public int Course { get; init; }
-            public string Group { get; init; }
-            public int RegStatus { get; init; }
-            public TelegramUser(int course, string group, int regStatus)
-            => (Course, Group, RegStatus) = (course, group, regStatus);
-        }
+    public record TelegramUser
+    {
+        public int Course { get; init; }
+        public string Group { get; init; }
+        public int RegStatus { get; init; }
+        public TelegramUser(int course, string group, int regStatus)
+        => (Course, Group, RegStatus) = (course, group, regStatus);
     }
 }
