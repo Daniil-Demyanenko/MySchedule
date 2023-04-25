@@ -1,6 +1,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using job_checker.InstituteParsers;
 
 namespace job_checker;
@@ -19,7 +20,6 @@ public static class CoupleSchedule
     /// </summary>
     public static IEnumerable<StudyGroup> StudyGroups => _StudyGroups;
 
-    private static string _cdir = AppDomain.CurrentDomain.BaseDirectory + "/Cache";
     private static List<StudyGroup> _StudyGroups;
     private static List<ClassInfo> _Couples;
 
@@ -28,11 +28,22 @@ public static class CoupleSchedule
     /// <summary>
     /// Заново распарсить и заполнить расписание
     /// </summary>
-    public static void Update()
+    public static void Update(string CachePath)
     {
-        using var IFMOIOT = new TemplateScheduleParser(AppDomain.CurrentDomain.BaseDirectory + "/ras.xls");
-        _Couples = IFMOIOT.Parse();
-        _StudyGroups = IFMOIOT.StudyGroups;
+        var files = Directory.GetFiles(CachePath);
+
+        var tempCouples = new List<ClassInfo>();
+        var tempStudyGroups = new List<StudyGroup>();
+
+        foreach (var file in files)
+        {
+            using var IFMOIOT = new TemplateScheduleParser(file);
+            tempCouples.AddRange(IFMOIOT.Parse());
+            tempStudyGroups.AddRange(IFMOIOT.StudyGroups);
+        }
+
+        _Couples = tempCouples;
+        _StudyGroups = tempStudyGroups;
     }
 
 }
