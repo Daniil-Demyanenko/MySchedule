@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Linq;
+using job_checker.TelegramUI;
 
 namespace job_checker;
 class Program

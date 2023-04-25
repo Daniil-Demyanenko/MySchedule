@@ -9,7 +9,7 @@ using Telegram.Bot.Args;
 using Telegram.Bot.Exceptions;
 using System.Threading;
 
-namespace job_checker
+namespace job_checker.TelegramUI
 {
     /// <summary>
     /// Класс, отвечающий за взаимодействие с пользователем
@@ -37,14 +37,14 @@ namespace job_checker
             {
                 new[]
                 {
-                    InlineKeyboardButton.WithCallbackData("1 курс", "1"),
-                    InlineKeyboardButton.WithCallbackData("2 курс", "2"),
-                    InlineKeyboardButton.WithCallbackData("3 курс", "3"),
+                    InlineKeyboardButton.WithCallbackData(" 1 курс ", "1"),
+                    InlineKeyboardButton.WithCallbackData(" 2 курс ", "2"),
+                    InlineKeyboardButton.WithCallbackData(" 3 курс ", "3"),
                 },
                 new[]
                 {
-                    InlineKeyboardButton.WithCallbackData("4 курс", "4"),
-                    InlineKeyboardButton.WithCallbackData("5 курс", "5"),
+                    InlineKeyboardButton.WithCallbackData(" 4 курс ", "4"),
+                    InlineKeyboardButton.WithCallbackData(" 5 курс ", "5"),
                 },
             });
 
@@ -57,15 +57,23 @@ namespace job_checker
             int course;
             if (update.Type == Telegram.Bot.Types.Enums.UpdateType.CallbackQuery && int.TryParse(update.CallbackQuery.Data, out course))
             {
-                _Users.TryAdd(update.CallbackQuery.Message.Chat.Id, new TelegramUser() { Course = course, RegStatus = 1 });
+                _Users.TryAdd(update.CallbackQuery.Message.Chat.Id, new TelegramUser() { Course = course, RegistrationStatus = 1 });
                 var a = update.CallbackQuery.Data;
 
                 await PrintPosibleGroupsForUser(TBClient, update, course);
-                if (update.CallbackQuery.Data == "start")
-                {
-                    await TBClient.SendTextMessageAsync(update.CallbackQuery.Message.Chat.Id, "Успешно", replyMarkup: ikm);
-                }
+
                 await TBClient.SendTextMessageAsync(update.CallbackQuery.Message.Chat.Id, $"Выбран {a} курс");
+            }
+            else if (update.Type == Telegram.Bot.Types.Enums.UpdateType.CallbackQuery && update.CallbackQuery.Data == "start")
+            {
+                await TBClient.SendTextMessageAsync(update.CallbackQuery.Message.Chat.Id, "Выберите свой курс:", replyMarkup: ikm);
+            }
+            else if (update.Type == Telegram.Bot.Types.Enums.UpdateType.CallbackQuery)
+            {
+                _Users[update.CallbackQuery.Message.Chat.Id].GroupName = update.CallbackQuery.Data;
+                _Users[update.CallbackQuery.Message.Chat.Id].RegistrationStatus = 2;
+
+
 
             }
 
@@ -87,16 +95,5 @@ namespace job_checker
         }
 
 
-    }
-
-
-    public struct TelegramUser
-    {
-        public int Course;
-        public string Group;
-        public int RegStatus = 0;
-        public TelegramUser() { }
-        public TelegramUser(int course, string group, int regStatus)
-        => (Course, Group, RegStatus) = (course, group, regStatus);
     }
 }
