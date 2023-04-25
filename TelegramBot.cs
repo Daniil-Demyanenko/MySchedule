@@ -24,7 +24,6 @@ namespace job_checker
             TBClient.StartReceiving(HandleUpdate, HandleError);
 
 
-
         }
 
         private static Task HandleError(ITelegramBotClient arg1, Exception arg2, CancellationToken arg3)
@@ -58,28 +57,38 @@ namespace job_checker
             int course;
             if (update.Type == Telegram.Bot.Types.Enums.UpdateType.CallbackQuery && int.TryParse(update.CallbackQuery.Data, out course))
             {
-                _Users.TryAdd(update.CallbackQuery.Message.Chat.Id, new TelegramUser() { Course = course, RegStatus = 1 });         
-                var a = update.CallbackQuery.Data;        
-                
-                await TBClient.SendTextMessageAsync(update.CallbackQuery.Message.Chat.Id, $"Выбран {a} курс");
+                _Users.TryAdd(update.CallbackQuery.Message.Chat.Id, new TelegramUser() { Course = course, RegStatus = 1 });
+                var a = update.CallbackQuery.Data;
+
                 await PrintPosibleGroupsForUser(TBClient, update, course);
+                if (update.CallbackQuery.Data == "start")
+                {
+                    await TBClient.SendTextMessageAsync(update.CallbackQuery.Message.Chat.Id, "Успешно", replyMarkup: ikm);
+                }
+                await TBClient.SendTextMessageAsync(update.CallbackQuery.Message.Chat.Id, $"Выбран {a} курс");
+
             }
+
         }
 
         private static async Task PrintPosibleGroupsForUser(ITelegramBotClient TBClient, Update update, int course)
         {
 
             var groups = CoupleSchedule.StudyGroups.Where(x => x.Course == course).Select(x => x.GroupName).Order().ToArray();
-            var buttons = new InlineKeyboardButton[groups.Count()][];
-
+            var buttons = new InlineKeyboardButton[groups.Count() + 1][];
             for (int i = 0; i < groups.Count(); i++)
                 buttons[i] = new[] { InlineKeyboardButton.WithCallbackData(groups[i], groups[i]) };
+
+            buttons[^1] = new[] { InlineKeyboardButton.WithCallbackData("Вернуться к выбору курса", "start") };
 
             var keyboard = new InlineKeyboardMarkup(buttons);
 
             await TBClient.SendTextMessageAsync(update.CallbackQuery.Message.Chat.Id, "Выберите группу:", replyMarkup: keyboard);
         }
+
+
     }
+
 
     public struct TelegramUser
     {
