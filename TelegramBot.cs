@@ -55,36 +55,38 @@ namespace job_checker
                 await TBClient.SendTextMessageAsync(update.Message.Chat.Id, "Здарова меченый, ты на старт нажал и в благородство я играть не буду. Выберешь курс свой, потом группу и мы в расчёте.", replyMarkup: ikm);
             }
 
-            if (update.Type == Telegram.Bot.Types.Enums.UpdateType.CallbackQuery)
+            int course;
+            if (update.Type == Telegram.Bot.Types.Enums.UpdateType.CallbackQuery && int.TryParse(update.CallbackQuery.Data, out course))
             {
-                var a = update.CallbackQuery.Data;
-                switch (a)
-                {
-                    case "1":
-                        await TBClient.SendTextMessageAsync(update.CallbackQuery.Message.Chat.Id, "Выбран 1 курс");
-                        break;
-                    case "2":
-                        await TBClient.SendTextMessageAsync(update.CallbackQuery.Message.Chat.Id, "Выбран 2 курс");
-                        break;
-                    case "3":
-                        await TBClient.SendTextMessageAsync(update.CallbackQuery.Message.Chat.Id, "Выбран 3 курс");
-                        break;
-                    case "4":
-                        await TBClient.SendTextMessageAsync(update.CallbackQuery.Message.Chat.Id, "Выбран 4 курс");
-                        break;
-                    case "5":
-                        await TBClient.SendTextMessageAsync(update.CallbackQuery.Message.Chat.Id, "Выбран 5 курс");
-                        break;
-                }
+                _Users.TryAdd(update.CallbackQuery.Message.Chat.Id, new TelegramUser() { Course = course, RegStatus = 1 });         
+                var a = update.CallbackQuery.Data;        
+                
+                await TBClient.SendTextMessageAsync(update.CallbackQuery.Message.Chat.Id, $"Выбран {a} курс");
+                await PrintPosibleGroupsForUser(TBClient, update, course);
             }
+        }
+
+        private static async Task PrintPosibleGroupsForUser(ITelegramBotClient TBClient, Update update, int course)
+        {
+
+            var groups = CoupleSchedule.StudyGroups.Where(x => x.Course == course).Select(x => x.GroupName).Order().ToArray();
+            var buttons = new InlineKeyboardButton[groups.Count()][];
+
+            for (int i = 0; i < groups.Count(); i++)
+                buttons[i] = new[] { InlineKeyboardButton.WithCallbackData(groups[i], groups[i]) };
+
+            var keyboard = new InlineKeyboardMarkup(buttons);
+
+            await TBClient.SendTextMessageAsync(update.CallbackQuery.Message.Chat.Id, "Выберите группу:", replyMarkup: keyboard);
         }
     }
 
-    public record TelegramUser
+    public struct TelegramUser
     {
-        public int Course { get; init; }
-        public string Group { get; init; }
-        public int RegStatus { get; init; }
+        public int Course;
+        public string Group;
+        public int RegStatus = 0;
+        public TelegramUser() { }
         public TelegramUser(int course, string group, int regStatus)
         => (Course, Group, RegStatus) = (course, group, regStatus);
     }
