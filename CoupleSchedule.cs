@@ -26,7 +26,7 @@ public static class CoupleSchedule
 
 
     /// <summary>
-    /// Заново распарсить и заполнить расписание
+    /// Заново распарсить и заполнить данные о расписании
     /// </summary>
     public static void Update(string CachePath)
     {
