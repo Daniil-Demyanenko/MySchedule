@@ -57,7 +57,7 @@ namespace job_checker.TelegramUI
             int course;
             if (update.Type == Telegram.Bot.Types.Enums.UpdateType.CallbackQuery && int.TryParse(update.CallbackQuery.Data, out course))
             {
-                _Users.TryAdd(update.CallbackQuery.Message.Chat.Id, new TelegramUser() { Course = course, RegistrationStatus = 1 });
+                _Users.TryAdd(update.CallbackQuery.Message.Chat.Id, new TelegramUser() { Course = course});
                 var a = update.CallbackQuery.Data;
 
                 await PrintPosibleGroupsForUser(TBClient, update, course);
@@ -71,7 +71,6 @@ namespace job_checker.TelegramUI
             else if (update.Type == Telegram.Bot.Types.Enums.UpdateType.CallbackQuery)
             {
                 _Users[update.CallbackQuery.Message.Chat.Id].GroupName = update.CallbackQuery.Data;
-                _Users[update.CallbackQuery.Message.Chat.Id].RegistrationStatus = 2;
 
 
 
