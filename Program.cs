@@ -42,8 +42,8 @@ class Program
         var UpdateTimer = new System.Timers.Timer(UpdateInterval);
         UpdateTimer.Elapsed += (s, e) =>
         {
-            ScheduleDownloader.CheckUpdate();
-            CoupleSchedule.Update(ScheduleDownloader.CacheDir);
+            if (ScheduleDownloader.CheckUpdate())
+                CoupleSchedule.Update(ScheduleDownloader.CacheDir);
         };
 
         UpdateTimer.AutoReset = true;

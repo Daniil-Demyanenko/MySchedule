@@ -15,9 +15,12 @@ public static class ScheduleDownloader
     public static readonly string CacheDir = AppDomain.CurrentDomain.BaseDirectory + "/Cache"; //Путь к папке Cache в директории программы
     private static readonly HttpClient _client = new HttpClient();
     private static string[] _sceduleNames = { "/ИФМОИОТ_ОФО_БАК.", "/ИФМОИОТ_ЗФО_БАК.", "/ИФМОИОТ_ОФО_МАГ.", "/ИФМОИОТ_ЗФО_МАГ." };
-    public static void CheckUpdate()
+    public static bool CheckUpdate()
     {
-        if (!CacheIsRelevant()) Download();
+        if (CacheIsRelevant()) return false;
+        
+        Download();
+        return true;
     }
 
     private static bool CacheIsRelevant()

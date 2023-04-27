@@ -1,4 +1,3 @@
-
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -37,9 +36,16 @@ public static class CoupleSchedule
 
         foreach (var file in files)
         {
-            using var IFMOIOT = new TemplateScheduleParser(file);
-            tempCouples.AddRange(IFMOIOT.Parse());
-            tempStudyGroups.AddRange(IFMOIOT.StudyGroups);
+            try
+            {
+                using var IFMOIOT = new TemplateScheduleParser(file);
+                tempCouples.AddRange(IFMOIOT.Parse());
+                tempStudyGroups.AddRange(IFMOIOT.StudyGroups);
+            }
+            catch
+            {
+                Console.WriteLine($"Не получилось спарсить файл: {file}");
+            }
         }
 
         _Couples = tempCouples;

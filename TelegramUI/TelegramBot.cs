@@ -50,7 +50,7 @@ public static class TelegramBot
 
         if (update.IsMessageType())
         {
-            HandeBugreport(TBClient, update, user);
+            await HandeBugreport(TBClient, update, user);
             return;
         }
 
