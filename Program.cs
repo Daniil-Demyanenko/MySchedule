@@ -23,7 +23,8 @@ class Program
 
     static void SetUpdateScheduleTimer()
     {
-        FullUpdate();
+        ScheduleDownloader.CheckUpdate();
+        CoupleSchedule.Update(ScheduleDownloader.CacheDir);
 
         var UpdateInterval = new TimeSpan(hours: 4, minutes: 5, seconds: 0);
         var UpdateTimer = new System.Timers.Timer(UpdateInterval);
