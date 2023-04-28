@@ -12,9 +12,17 @@ namespace job_checker;
 
 public static class ScheduleDownloader
 {
+    /// <summary>
+    /// Путь к дирректирии с расписаниями
+    /// </summary>
     public static readonly string CacheDir = AppDomain.CurrentDomain.BaseDirectory + "/Cache"; //Путь к папке Cache в директории программы
     private static readonly HttpClient _client = new HttpClient();
     private static string[] _sceduleNames = { "/ИФМОИОТ_ОФО_БАК.", "/ИФМОИОТ_ЗФО_БАК.", "/ИФМОИОТ_ОФО_МАГ.", "/ИФМОИОТ_ЗФО_МАГ." };
+
+    /// <summary>
+    /// Скачивает расписания, если они могли устареть
+    /// </summary>
+    /// <returns>true, если обновил расписания</returns>
     public static bool CheckUpdate()
     {
         if (CacheIsRelevant()) return false;

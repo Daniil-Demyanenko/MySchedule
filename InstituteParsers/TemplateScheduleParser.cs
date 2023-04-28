@@ -143,7 +143,7 @@ public class TemplateScheduleParser : IDisposable
                 string? className = _Sheet.Cells[rowWithCouple, col].Value?.ToString() ?? null;
                 if (className is null) continue;
 
-                var time = _Sheet.Cells[rowWithCouple, 2].Value.ToString()?.Trim();
+                var time = _Sheet.Cells[rowWithCouple, 2].Value.ToString().Trim();
                 var classItem = new ClassInfo(className, day.Date, day.Name, time, groupName, course);
                 result.Add(classItem);
             }

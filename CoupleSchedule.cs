@@ -44,12 +44,13 @@ public static class CoupleSchedule
             }
             catch
             {
-                Console.WriteLine($"Не получилось спарсить файл: {file}");
+                Console.WriteLine($"Error >> Не получилось спарсить файл: {file}");
             }
         }
 
         _Couples = tempCouples;
         _StudyGroups = tempStudyGroups;
+        Console.WriteLine($"Info >> Обновлено {_Couples.Count} пар.");
     }
 
 }
