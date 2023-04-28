@@ -11,7 +11,7 @@ using Telegram.Bot.Exceptions;
 using System.Threading;
 using System.Text.RegularExpressions;
 
-namespace job_checker.TelegramUI;
+namespace MySchedule.TelegramUI;
 
 /// <summary>
 /// Класс, отвечающий за взаимодействие с пользователем

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace job_checker.UnitTests
+namespace MySchedule.UnitTests
 {
     public static class Paths
     {

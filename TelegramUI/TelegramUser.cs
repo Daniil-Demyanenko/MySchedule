@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace job_checker.TelegramUI;
+namespace MySchedule.TelegramUI;
 public class TelegramUser
 {
     [Key]

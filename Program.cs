@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Threading;
 using System.Linq;
-using job_checker.TelegramUI;
+using MySchedule.TelegramUI;
 
-namespace job_checker;
+namespace MySchedule;
 class Program
 {
     static void Main(string[] args)

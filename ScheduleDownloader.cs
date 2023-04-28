@@ -8,7 +8,7 @@ using Newtonsoft.Json;
 using System.Text;
 using System.Collections.Generic;
 
-namespace job_checker;
+namespace MySchedule;
 
 public static class ScheduleDownloader
 {

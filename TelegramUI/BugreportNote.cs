@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace job_checker.TelegramUI;
+namespace MySchedule.TelegramUI;
 public class BugreportNote
 {
     [Key]

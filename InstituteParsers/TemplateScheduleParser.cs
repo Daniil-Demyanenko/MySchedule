@@ -4,7 +4,7 @@ using System.Globalization;
 using Aspose.Cells;
 #nullable enable
 
-namespace job_checker.InstituteParsers;
+namespace MySchedule.InstituteParsers;
 
 // TODO:
 // Поиск имён преподавателей, регулярка: \b[\w]{4,}\b\s+\w\.\s*\w\.*

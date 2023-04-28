@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using job_checker.InstituteParsers;
+using MySchedule.InstituteParsers;
 using Xunit;
 
-namespace job_checker.UnitTests;
+namespace MySchedule.UnitTests;
 
 public class ParserCouplesUnitTests
 {

@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using job_checker.InstituteParsers;
+using MySchedule.InstituteParsers;
 
-namespace job_checker;
+namespace MySchedule;
 
 /// <summary>
 /// Глобальное расписание пар университета

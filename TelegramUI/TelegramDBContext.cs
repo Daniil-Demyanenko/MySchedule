@@ -1,7 +1,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 
-namespace job_checker.TelegramUI;
+namespace MySchedule.TelegramUI;
 public class TelegramDBContext : DbContext
 {
     private static string DBPath = AppDomain.CurrentDomain.BaseDirectory + "Users.db";
