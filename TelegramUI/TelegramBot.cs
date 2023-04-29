@@ -189,7 +189,7 @@ public static class TelegramBot
         buttons[1] = new[] { InlineKeyboardButton.WithCallbackData("Обновить расписание", "PRINT") };
         var keyboard = new InlineKeyboardMarkup(buttons);
 
-        await TBClient.SendTextMessageAsync(user.ChatID, "<i>Если вы заметили какую-то ошибку в работе этого бота, пожалуйста, сообщите о ней разработчикам. Это можно сделать просто подробно описав и отправив её в сообщении.</i>",
+        await TBClient.SendTextMessageAsync(user.ChatID, "<i>Если вы заметили какую-то ошибку в работе этого бота, пожалуйста, сообщите о ней разработчикам. Это можно сделать просто подробно описав и отправив её в сообщении этому боту.</i>",
                                              parseMode: Telegram.Bot.Types.Enums.ParseMode.Html, replyMarkup: keyboard);
     }
 
