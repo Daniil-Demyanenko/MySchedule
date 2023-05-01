@@ -5,8 +5,17 @@
     <TargetFramework>net7.0</TargetFramework>
 
     <GenerateProgramFile>false</GenerateProgramFile>
+
     <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
     <TrimMode>partial</TrimMode>
+    <!-- <PublishTrimmed>true</PublishTrimmed> -->
+    <!-- <TrimmableAssembly Include="Microsoft.NET.Test.Sdk" />
+    <TrimmableAssembly Include="xunit" />
+    <TrimmableAssembly Include="xunit.runner.visualstudio" /> -->
+
+    <!-- <PublishAot>true</PublishAot>
+    <OptimizationPreference>Speed</OptimizationPreference>
+    <StripSymbols>true</StripSymbols> -->
   </PropertyGroup>
 
   <ItemGroup>
