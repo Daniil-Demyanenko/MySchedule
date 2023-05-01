@@ -169,6 +169,13 @@ public static class TelegramBot
 
     private static async Task HandePrintCouplesSelection(ITelegramBotClient TBClient, TelegramUser user)
     {
+        if (user.GroupName is null || !CoupleSchedule.StudyGroups.Any(x => x.Course == user.Course && x.GroupName == user.GroupName))
+        {
+            await TBClient.SendTextMessageAsync(user.ChatID, "Ваша группа не найдена в расписании. Вероятно, в обновлённом рассписании её назвали как-то подругому. Выберите её заново.");
+            await RestartRegistration(TBClient, user);
+            return;
+        }
+
         await TBClient.SendTextMessageAsync(user.ChatID, $"Расписание для {user.Course} - {user.GroupName}");
 
         var days = CoupleSchedule.Couples.Where(x => x.Course == user.Course && x.Group == user.GroupName).GroupBy(x => x.Date);
@@ -238,10 +245,6 @@ public static class TelegramBot
 
     private static Task HandleError(ITelegramBotClient tbc, Exception e, CancellationToken ct)
     {
-        if (e.Message == "Forbidden: bot was blocked by the user")
-        {
-
-        }
         throw new NotImplementedException();
     }
 }

@@ -8,6 +8,8 @@ class Program
 {
     static void Main(string[] args)
     {
+        if(args.Length != 1) throw new Exception("Не указан токен для бота.");
+
         SetUpdateScheduleTimer(); //Запускаем таймер, проверяющий обновление расписаний каждые 4 часа
         while (CoupleSchedule.Couples is null) Thread.Sleep(100);
         TelegramBot.Start(args[0]);
