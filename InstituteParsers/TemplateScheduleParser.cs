@@ -41,8 +41,8 @@ public class TemplateScheduleParser : IDisposable
     }
     public void Dispose()
     {
-        _Sheet.Dispose();
-        _Workbook.Dispose();
+        _Sheet?.Dispose();
+        _Workbook?.Dispose();
     }
 
     public List<ClassInfo> Parse()
