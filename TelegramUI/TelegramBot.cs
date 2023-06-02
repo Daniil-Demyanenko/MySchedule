@@ -116,7 +116,7 @@ public static class TelegramBot
 
     private static async Task RequestPosibleGroup(long chatID, int course)
     {
-        var groups = CoupleSchedule.StudyGroups.Where(x => x.Course == course).Select(x => x.GroupName).Order().ToArray();
+        var groups = CouplesSchedule.StudyGroups.Where(x => x.Course == course).Select(x => x.GroupName).Order().ToArray();
         var buttons = new InlineKeyboardButton[groups.Count() + 1][];
 
         for (int i = 0; i < groups.Count(); i++)
@@ -167,7 +167,7 @@ public static class TelegramBot
 
     private static async Task HandePrintCouplesSelection(TelegramUser user)
     {
-        if (user.GroupName is null || !CoupleSchedule.StudyGroups.Any(x => x.Course == user.Course && x.GroupName == user.GroupName))
+        if (user.GroupName is null || !CouplesSchedule.StudyGroups.Any(x => x.Course == user.Course && x.GroupName == user.GroupName))
         {
             await TBClient.SendTextMessageAsync(user.ChatID, "Ваша группа не найдена в расписании. Вероятно, в обновлённом рассписании её назвали как-то подругому. Выберите её заново.");
             await RestartRegistration(user);
@@ -176,7 +176,7 @@ public static class TelegramBot
 
         await TBClient.SendTextMessageAsync(user.ChatID, $"Расписание для {user.Course} - {user.GroupName}");
 
-        var days = CoupleSchedule.Couples.Where(x => x.Course == user.Course && x.Group == user.GroupName).GroupBy(x => x.Date);
+        var days = CouplesSchedule.Couples.Where(x => x.Course == user.Course && x.Group == user.GroupName).GroupBy(x => x.Date);
 
         foreach (var day in days)
         {

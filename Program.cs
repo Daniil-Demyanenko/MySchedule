@@ -11,7 +11,7 @@ class Program
         if(args.Length != 1) throw new Exception("Не указан токен для бота.");
 
         SetUpdateScheduleTimer(); //Запускаем таймер, проверяющий обновление расписаний каждые 4 часа
-        while (CoupleSchedule.Couples is null) Thread.Sleep(100);
+        while (CouplesSchedule.Couples is null) Thread.Sleep(100);
         TelegramBot.Start(args[0]);
 
         Console.WriteLine("Press 'q' to stop program and exit...");
@@ -26,7 +26,7 @@ class Program
     static async void SetUpdateScheduleTimer()
     {
         await ScheduleDownloader.CheckUpdate();
-        CoupleSchedule.Update(ScheduleDownloader.CacheDir);
+        CouplesSchedule.Update(ScheduleDownloader.CacheDir);
 
         var UpdateInterval = new TimeSpan(hours: 4, minutes: 5, seconds: 0);
         var UpdateTimer = new System.Timers.Timer(UpdateInterval);
@@ -42,7 +42,7 @@ class Program
         try
         {
             if (await ScheduleDownloader.CheckUpdate())
-                CoupleSchedule.Update(ScheduleDownloader.CacheDir);
+                CouplesSchedule.Update(ScheduleDownloader.CacheDir);
         }
         catch
         {

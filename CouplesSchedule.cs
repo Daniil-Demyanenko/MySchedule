@@ -2,13 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using MySchedule.InstituteParsers;
+using System.Linq;
 
 namespace MySchedule;
 
 /// <summary>
 /// Глобальное расписание пар университета
 /// </summary>
-public static class CoupleSchedule
+public static class CouplesSchedule
 {
     /// <summary>
     /// Список пар всех институтов
@@ -33,6 +34,8 @@ public static class CoupleSchedule
 
         var tempCouples = new List<ClassInfo>();
         var tempStudyGroups = new List<StudyGroup>();
+
+        // Enumerable.Range(0,10).AsParallel();
 
         foreach (var file in files)
         {
