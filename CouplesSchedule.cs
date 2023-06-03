@@ -2,7 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using MySchedule.InstituteParsers;
-using System.Linq;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace MySchedule;
 
@@ -35,10 +36,7 @@ public static class CouplesSchedule
         var tempCouples = new List<ClassInfo>();
         var tempStudyGroups = new List<StudyGroup>();
 
-        // Enumerable.Range(0,10).AsParallel();
-
-        foreach (var file in files)
-        {
+        var parsing = Parallel.ForEach(files, (file)=>{
             try
             {
                 using var IFMOIOT = new TemplateScheduleParser(file);
@@ -49,7 +47,25 @@ public static class CouplesSchedule
             {
                 Console.WriteLine($"Error >> Не получилось спарсить файл: {file}");
             }
-        }
+        });
+
+        // foreach (var file in files)
+        // {
+        //     try
+        //     {
+        //         using var IFMOIOT = new TemplateScheduleParser(file);
+        //         tempCouples.AddRange(IFMOIOT.Parse());
+        //         tempStudyGroups.AddRange(IFMOIOT.StudyGroups);
+        //     }
+        //     catch
+        //     {
+        //         Console.WriteLine($"Error >> Не получилось спарсить файл: {file}");
+        //     }
+        // }
+
+
+        while (!parsing.IsCompleted)
+            Thread.Sleep(20);
 
         _Couples = tempCouples;
         _StudyGroups = tempStudyGroups;
