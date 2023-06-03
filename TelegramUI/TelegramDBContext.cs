@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 namespace MySchedule.TelegramUI;
 public class TelegramDBContext : DbContext
 {
-    private static string DBPath = AppDomain.CurrentDomain.BaseDirectory + "Users.db";
+    private static string _DBPath = AppDomain.CurrentDomain.BaseDirectory + "Users.db";
 
     public DbSet<TelegramUser> Users { get; set; }
     public DbSet<BugreportNote> Bugreports { get; set; }
@@ -12,6 +12,6 @@ public class TelegramDBContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        optionsBuilder.UseSqlite($"Data Source={DBPath}");
+        optionsBuilder.UseSqlite($"Data Source={_DBPath}");
     }
 }

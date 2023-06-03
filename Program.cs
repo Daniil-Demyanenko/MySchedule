@@ -1,18 +1,19 @@
 ﻿using System;
 using System.Threading;
-using System.Linq;
 using MySchedule.TelegramUI;
 
 namespace MySchedule;
+
 class Program
 {
     static void Main(string[] args)
     {
-        if(args.Length != 1) throw new Exception("Не указан токен для бота.");
+        if (args.Length != 1) throw new Exception("Не указан токен для бота.");
 
         SetUpdateScheduleTimer(); //Запускаем таймер, проверяющий обновление расписаний каждые 4 часа
         while (CouplesSchedule.Couples is null) Thread.Sleep(100);
         TelegramBot.Start(args[0]);
+
 
         Console.WriteLine("Press 'q' to stop program and exit...");
         while (true)
@@ -28,13 +29,13 @@ class Program
         await ScheduleDownloader.CheckUpdate();
         CouplesSchedule.Update(ScheduleDownloader.CacheDir);
 
-        var UpdateInterval = new TimeSpan(hours: 4, minutes: 5, seconds: 0);
-        var UpdateTimer = new System.Timers.Timer(UpdateInterval);
-        UpdateTimer.Elapsed += (s, e) => FullUpdate();
+        var updateInterval = new TimeSpan(hours: 4, minutes: 5, seconds: 0);
+        var updateTimer = new System.Timers.Timer(updateInterval);
+        updateTimer.Elapsed += (s, e) => FullUpdate();
 
-        UpdateTimer.AutoReset = true;
-        UpdateTimer.Enabled = true;
-        UpdateTimer.Start();
+        updateTimer.AutoReset = true;
+        updateTimer.Enabled = true;
+        updateTimer.Start();
     }
 
     static async void FullUpdate()
@@ -50,4 +51,3 @@ class Program
         }
     }
 }
-

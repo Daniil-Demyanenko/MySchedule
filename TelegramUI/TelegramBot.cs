@@ -19,15 +19,15 @@ namespace MySchedule.TelegramUI;
 public static class TelegramBot
 {
     private static TelegramDBContext _DB = new();
-    private static ITelegramBotClient TBClient;
+    private static ITelegramBotClient _TBClient;
 
     public static void Start(string token)
     {
-        TBClient = new TelegramBotClient(token);
+        _TBClient = new TelegramBotClient(token);
 
-        TBClient.StartReceiving(async (tbc, u, ct) =>
+        _TBClient.StartReceiving(async (tbc, u, ct) =>
         {
-            try { await HandleUpdate(tbc, u, ct); }
+            try { await HandleUpdate(u); }
             catch (Exception e)
             {
                 Console.WriteLine($"Error >> Ошибка обработки сообщения: {e.Message}");
@@ -37,7 +37,7 @@ public static class TelegramBot
     }
 
 
-    private async static Task HandleUpdate(ITelegramBotClient TBClient, Update update, CancellationToken ct)
+    private static async Task HandleUpdate(Update update)
     {
         if (!update.IsMessageType() && !update.IsCallbackType()) return;
 
@@ -46,7 +46,7 @@ public static class TelegramBot
 
         if (update.IsMessageType() && update.Message.Text == "/start" && !user.IsRegistered())
         {
-            await TBClient.SendTextMessageAsync(user.ChatID, "Этот бот служит для удобного получения расписания студентов ИФОИОТ.");
+            await _TBClient.SendTextMessageAsync(user.ChatID, "Этот бот служит для удобного получения расписания студентов ИФОИОТ.");
             await RequestCourse(user.ChatID);
             return;
         }
@@ -98,14 +98,14 @@ public static class TelegramBot
                 },
         });
 
-        await TBClient.SendTextMessageAsync(chatID, "Выберите курс:", replyMarkup: ikm);
+        await _TBClient.SendTextMessageAsync(chatID, "Выберите курс:", replyMarkup: ikm);
     }
 
     private static async Task HandeCourseSelection(Update update, TelegramUser user)
     {
         int course = int.Parse(update.CallbackQuery.Data.Split('_', StringSplitOptions.RemoveEmptyEntries)[1]);
 
-        await TBClient.SendTextMessageAsync(user.ChatID, $"Выбран {course} курс.");
+        await _TBClient.SendTextMessageAsync(user.ChatID, $"Выбран {course} курс.");
 
         user.Course = course;
         _DB.Update(user);
@@ -126,7 +126,7 @@ public static class TelegramBot
 
         var keyboard = new InlineKeyboardMarkup(buttons);
 
-        await TBClient.SendTextMessageAsync(chatID, "Выберите группу:", replyMarkup: keyboard);
+        await _TBClient.SendTextMessageAsync(chatID, "Выберите группу:", replyMarkup: keyboard);
     }
 
     private static async Task HandeGroupSelection(Update update, TelegramUser user)
@@ -134,7 +134,7 @@ public static class TelegramBot
         Match matches = Regex.Match(update.CallbackQuery.Data, "^GROUP_(.*)");
         user.GroupName = matches.Groups[1].ToString();
 
-        await TBClient.SendTextMessageAsync(user.ChatID, $"Выбрана группа {user.GroupName}.");
+        await _TBClient.SendTextMessageAsync(user.ChatID, $"Выбрана группа {user.GroupName}.");
 
         _DB.Update(user);
         await _DB.SaveChangesAsync();
@@ -144,7 +144,7 @@ public static class TelegramBot
 
     private static async Task RestartRegistration(TelegramUser user)
     {
-        await TBClient.SendTextMessageAsync(user.ChatID, "Настройки пользователя сброшены.");
+        await _TBClient.SendTextMessageAsync(user.ChatID, "Настройки пользователя сброшены.");
 
         user.Course = null;
         user.GroupName = null;
@@ -162,19 +162,19 @@ public static class TelegramBot
         _DB.Bugreports.Add(note);
         await _DB.SaveChangesAsync();
 
-        await TBClient.SendTextMessageAsync(update.GetChatID(), "Спасибо за ваш отсчёт об ошибке! Постараемся решить в скорейшее время.");
+        await _TBClient.SendTextMessageAsync(update.GetChatID(), "Спасибо за ваш отсчёт об ошибке! Постараемся решить в скорейшее время.");
     }
 
     private static async Task HandePrintCouplesSelection(TelegramUser user)
     {
         if (user.GroupName is null || !CouplesSchedule.StudyGroups.Any(x => x.Course == user.Course && x.GroupName == user.GroupName))
         {
-            await TBClient.SendTextMessageAsync(user.ChatID, "Ваша группа не найдена в расписании. Вероятно, в обновлённом рассписании её назвали как-то подругому. Выберите её заново.");
+            await _TBClient.SendTextMessageAsync(user.ChatID, "Ваша группа не найдена в расписании. Вероятно, в обновлённом рассписании её назвали как-то подругому. Выберите её заново.");
             await RestartRegistration(user);
             return;
         }
 
-        await TBClient.SendTextMessageAsync(user.ChatID, $"Расписание для {user.Course} - {user.GroupName}");
+        await _TBClient.SendTextMessageAsync(user.ChatID, $"Расписание для {user.Course} - {user.GroupName}");
 
         var days = CouplesSchedule.Couples.Where(x => x.Course == user.Course && x.Group == user.GroupName).GroupBy(x => x.Date);
 
@@ -186,7 +186,7 @@ public static class TelegramBot
             foreach (var c in sortedCouples)
                 message.Append($"{c.Time} ||  {c.Title}\n\n");
 
-            await TBClient.SendTextMessageAsync(user.ChatID, message.ToString());
+            await _TBClient.SendTextMessageAsync(user.ChatID, message.ToString());
         }
 
         var buttons = new InlineKeyboardButton[2][];
@@ -194,7 +194,7 @@ public static class TelegramBot
         buttons[1] = new[] { InlineKeyboardButton.WithCallbackData("Обновить расписание", "PRINT") };
         var keyboard = new InlineKeyboardMarkup(buttons);
 
-        await TBClient.SendTextMessageAsync(user.ChatID, "<i>Если вы заметили какую-то ошибку в работе этого бота, пожалуйста, сообщите о ней разработчикам. Это можно сделать просто подробно описав и отправив её в сообщении этому боту.</i>",
+        await _TBClient.SendTextMessageAsync(user.ChatID, "<i>Если вы заметили какую-то ошибку в работе этого бота, пожалуйста, сообщите о ней разработчикам. Это можно сделать просто подробно описав и отправив её в сообщении этому боту.</i>",
                                              parseMode: Telegram.Bot.Types.Enums.ParseMode.Html, replyMarkup: keyboard);
     }
 

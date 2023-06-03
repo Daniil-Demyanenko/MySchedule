@@ -17,7 +17,7 @@ public static class ScheduleDownloader
     /// </summary>
     public static readonly string CacheDir = AppDomain.CurrentDomain.BaseDirectory + "/Cache"; //Путь к папке Cache в директории программы
     private static readonly HttpClient _client = new HttpClient();
-    private static string[] _sceduleNames = { "/ИФМОИОТ_ОФО_БАК.", "/ИФМОИОТ_ЗФО_БАК.", "/ИФМОИОТ_ОФО_МАГ.", "/ИФМОИОТ_ЗФО_МАГ." };
+    private static readonly string[] _shceduleNames = { "/ИФМОИОТ_ОФО_БАК.", "/ИФМОИОТ_ЗФО_БАК.", "/ИФМОИОТ_ОФО_МАГ.", "/ИФМОИОТ_ЗФО_МАГ." };
 
     /// <summary>
     /// Скачивает расписания, если они могли устареть
@@ -82,7 +82,7 @@ public static class ScheduleDownloader
             HtmlNodeCollection xpathLink = document.DocumentNode.SelectNodes($"//tr[3]/td[{i + 2}]/p/a");
             if (xpathLink != null)
             {
-                links.Add((_sceduleNames[i], xpathLink[0].GetAttributeValue("href", "")));
+                links.Add((_shceduleNames[i], xpathLink[0].GetAttributeValue("href", "")));
                 continue;
             }
         }
@@ -112,7 +112,7 @@ public static class ScheduleDownloader
         response.EnsureSuccessStatusCode();
 
         dynamic result = JsonConvert.DeserializeObject(await response.Content.ReadAsStringAsync());
-        return (result.name, result.file);
+        return (result!.name, result.file);
     }
 
     private static async Task DownloadFromDirectLinkAsync(string url, string path)
@@ -122,8 +122,8 @@ public static class ScheduleDownloader
             using var response = await _client.GetAsync(url);
             response.EnsureSuccessStatusCode();
 
-            using var stream = await response.Content.ReadAsStreamAsync();
-            using var fileStream = File.Create(path);
+            await using var stream = await response.Content.ReadAsStreamAsync();
+            await using var fileStream = File.Create(path);
             await stream.CopyToAsync(fileStream);
         }
         catch (Exception e)

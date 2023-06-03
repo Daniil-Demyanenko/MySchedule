@@ -87,7 +87,7 @@ public class TemplateScheduleParser : IDisposable
 
             if (cellValue is not null && !_Sheet.Cells.Columns[i].IsHidden)       //Ячейка имеет значение, не является скрытой
             {
-                if (_Sheet.Cells[_GroupNameRow, i].Value?.ToString().Trim() == "группа") break;
+                if (_Sheet.Cells[_GroupNameRow, i].Value?.ToString()?.Trim() == "группа") break;
                 result.Add(i);
             }
         }
@@ -135,8 +135,8 @@ public class TemplateScheduleParser : IDisposable
 
         foreach (var day in dayPos)
         {
-            int ClassesCountOfDay = _Sheet.Cells[day.Pos, 0].GetMergedRange().RowCount;
-            for (int i = 0; i < ClassesCountOfDay; i++)
+            int classesCountOfDay = _Sheet.Cells[day.Pos, 0].GetMergedRange().RowCount;
+            for (int i = 0; i < classesCountOfDay; i++)
             {
                 int rowWithCouple = day.Pos + i;
                 if (_Sheet.Cells.Rows[rowWithCouple].IsHidden) continue;
