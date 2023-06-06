@@ -4,14 +4,14 @@ using MySchedule.TelegramUI;
 
 namespace MySchedule;
 
-class Program
+internal class Program
 {
-    static void Main(string[] args)
+    private static void Main(string[] args)
     {
         if (args.Length != 1) throw new Exception("Не указан токен для бота.");
 
         SetUpdateScheduleTimer(); //Запускаем таймер, проверяющий обновление расписаний каждые 4 часа
-        while (CouplesSchedule.Couples is null) Thread.Sleep(100);
+        while (Schedule.Couples is null) Thread.Sleep(100);
         TelegramBot.Start(args[0]);
 
 
@@ -24,10 +24,10 @@ class Program
     }
 
 
-    static async void SetUpdateScheduleTimer()
+    private static async void SetUpdateScheduleTimer()
     {
         await ScheduleDownloader.CheckUpdate();
-        CouplesSchedule.Update(ScheduleDownloader.CacheDir);
+        Schedule.Update(ScheduleDownloader.CacheDir);
 
         var updateInterval = new TimeSpan(hours: 4, minutes: 5, seconds: 0);
         var updateTimer = new System.Timers.Timer(updateInterval);
@@ -38,12 +38,12 @@ class Program
         updateTimer.Start();
     }
 
-    static async void FullUpdate()
+    private static async void FullUpdate()
     {
         try
         {
             if (await ScheduleDownloader.CheckUpdate())
-                CouplesSchedule.Update(ScheduleDownloader.CacheDir);
+                Schedule.Update(ScheduleDownloader.CacheDir);
         }
         catch
         {

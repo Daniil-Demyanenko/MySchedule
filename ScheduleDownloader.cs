@@ -7,6 +7,7 @@ using HtmlAgilityPack;
 using Newtonsoft.Json;
 using System.Text;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace MySchedule;
 
@@ -47,13 +48,8 @@ public static class ScheduleDownloader
             return false;
         }
 
-        for (int i = 0; i < dirFiles.Length; i++)
-        {
-            var fileWriteDate = File.GetLastWriteTime(dirFiles[i]);
-            if ((DateTime.Now - fileWriteDate).TotalHours >= 4) return false;
-        }
-
-        return true;
+        return dirFiles.Select(File.GetLastWriteTime)
+               .All(fileWriteDate => !((DateTime.Now - fileWriteDate).TotalHours >= 4));
     }
 
     private static async Task Download()
@@ -67,7 +63,7 @@ public static class ScheduleDownloader
             string extension = name.Split('.')[^1]; // получаем расширение файла (xls или xlsx)
             string filePath = CacheDir + item.Item1 + extension; // генерируем имя скачанного файла
 
-            DownloadFromDirectLinkAsync(link, filePath).Wait(); // ждём окончания загрузки
+            await DownloadFromDirectLinkAsync(link, filePath); // ждём окончания загрузки
         }
     }
 
@@ -94,13 +90,11 @@ public static class ScheduleDownloader
     {
         string result = string.Empty;
 
-        using HttpClient client = new HttpClient();
+        using HttpClient client = new();
         using HttpResponseMessage response = await client.GetAsync(url);
 
         if (response.IsSuccessStatusCode)
-        {
             result = await response.Content.ReadAsStringAsync();
-        }
 
         return result;
     }

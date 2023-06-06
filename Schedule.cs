@@ -1,16 +1,15 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using MySchedule.InstituteParsers;
-using System.Threading.Tasks;
-using System.Threading;
 
 namespace MySchedule;
 
 /// <summary>
 /// Глобальное расписание пар университета
 /// </summary>
-public static class CouplesSchedule
+public static class Schedule
 {
     /// <summary>
     /// Список пар всех институтов
@@ -36,36 +35,18 @@ public static class CouplesSchedule
         var tempCouples = new List<ClassInfo>();
         var tempStudyGroups = new List<StudyGroup>();
 
-        var parsing = Parallel.ForEach(files, (file)=>{
+        files.AsParallel().ForAll((file)=>{
             try
             {
                 using var IFMOIOT = new TemplateScheduleParser(file);
                 tempCouples.AddRange(IFMOIOT.Parse());
                 tempStudyGroups.AddRange(IFMOIOT.StudyGroups);
             }
-            catch
+            catch (Exception e)
             {
-                Console.WriteLine($"Error >> Не получилось спарсить файл: {file}");
+                Console.WriteLine($"Error >> Не получилось спарсить файл: {file}. Ошибка: {e.Message}");
             }
         });
-
-        // foreach (var file in files)
-        // {
-        //     try
-        //     {
-        //         using var IFMOIOT = new TemplateScheduleParser(file);
-        //         tempCouples.AddRange(IFMOIOT.Parse());
-        //         tempStudyGroups.AddRange(IFMOIOT.StudyGroups);
-        //     }
-        //     catch
-        //     {
-        //         Console.WriteLine($"Error >> Не получилось спарсить файл: {file}");
-        //     }
-        // }
-
-
-        while (!parsing.IsCompleted)
-            Thread.Sleep(20);
 
         _couples = tempCouples;
         _studyGroups = tempStudyGroups;

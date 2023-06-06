@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using Aspose.Cells;
 #nullable enable
 
@@ -66,7 +67,7 @@ public class TemplateScheduleParser : IDisposable
 
         foreach (var pos in groupsPos)
         {
-            var (course, groupName) = SplitGroupNameForMergedCellsOrNot(colWithGroup: pos);
+            var (course, groupName) = SplitGroupName(colWithGroup: pos);
 
             result.Add(new StudyGroup(course, groupName));
         }
@@ -131,7 +132,7 @@ public class TemplateScheduleParser : IDisposable
         int course;
         string groupName;
 
-        (course, groupName) = SplitGroupNameForMergedCellsOrNot(colWithGroup: col);
+        (course, groupName) = SplitGroupName(colWithGroup: col);
 
         foreach (var day in dayPos)
         {
@@ -151,13 +152,31 @@ public class TemplateScheduleParser : IDisposable
 
         return result;
     }
+    
+    /// <summary>
+    /// Разделяет название группы на Курс и Направление подготовки.
+    /// Добавляет уточнение для объеденённых групп в название
+    /// </summary>
+    /// <param name="colWithGroup">индекс колонки с названием группы</param>
+    /// <returns>(Курс, Направление подготовки)</returns>
+    private (int, string) SplitGroupName(int colWithGroup)
+    {
+        int course;
+        string groupName;
+
+        if (_Sheet.Cells[_GroupNameRow, colWithGroup].IsMerged)
+            (course, groupName) = SplitGroupNameForMerged(colWithGroup);
+        else (course, groupName) = SplitGroupNameForNotMerget(colWithGroup);
+
+        return (course, groupName);
+    }
 
     /// <summary>
     /// Разделяет название группы на Курс и Направление подготовки
     /// </summary>
     /// <param name="colWithGroup">индекс колонки с названием группы</param>
     /// <returns>(Курс, Направление подготовки)</returns>
-    protected (int, string) SplitGroupName(int colWithGroup)
+    protected (int, string) SplitGroupNameForNotMerget(int colWithGroup)
     {
         string[] groupTitle = _Sheet.Cells[_GroupNameRow, colWithGroup].Value.ToString().Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries); // Полное название группы
         string groupName = String.Join(' ', groupTitle[1..]).Trim(); // Только название группы
@@ -178,7 +197,7 @@ public class TemplateScheduleParser : IDisposable
 
         if (isSecondCell) colWithGroup--;
 
-        (int course, string groupName) = SplitGroupName(colWithGroup);
+        (int course, string groupName) = SplitGroupNameForNotMerget(colWithGroup);
 
         string appendName = _Sheet.Cells[_GroupNameRow + 1, isSecondCell ? colWithGroup + 1 : colWithGroup].Value.ToString().Trim()[0..^1].Trim();
         groupName += $" [{appendName}]";
@@ -193,18 +212,15 @@ public class TemplateScheduleParser : IDisposable
     {
         int colCount = 1000;
 
-        for (int row = 7; row < 1000; row++)
+        for (var row = 7; row < 1000; row++)
         {
             if (_Sheet.Cells.Rows[row].IsHidden) continue;
             for (int col = 3; col < colCount; col++)
             {
                 if (_Sheet.Cells.Columns[col].IsHidden) continue;
                 Cell cell = _Sheet.Cells[row, col];
-
-                int visibleRow = row;
-                int visibleCol = col;
-
-                return new CellPosition(visibleCol, visibleRow);
+                
+                return new CellPosition(col, row);
             }
         }
 
@@ -230,30 +246,8 @@ public class TemplateScheduleParser : IDisposable
     public static bool IsContainDayOfWeek(string str)
     {
         var days = new string[] { "понедельник", "вторник", "среда", "четверг", "пятница", "суббота" };
-        foreach (var day in days)
-            if (str.Contains(day, StringComparison.InvariantCultureIgnoreCase)) return true;
-
-        return false;
+        return days.Any(day => str.Contains(day, StringComparison.InvariantCultureIgnoreCase));
     }
-
-    /// <summary>
-    /// Разделяет название группы на Курс и Направление подготовки.
-    /// Добавляет уточнение для объеденённых групп в название
-    /// </summary>
-    /// <param name="colWithGroup">индекс колонки с названием группы</param>
-    /// <returns>(Курс, Направление подготовки)</returns>
-    private (int, string) SplitGroupNameForMergedCellsOrNot(int colWithGroup)
-    {
-        int course;
-        string groupName;
-
-        if (_Sheet.Cells[_GroupNameRow, colWithGroup].IsMerged)
-            (course, groupName) = SplitGroupNameForMerged(colWithGroup);
-        else (course, groupName) = SplitGroupName(colWithGroup);
-
-        return (course, groupName);
-    }
-
 
     /// <summary>
     /// Положение и название дня недели

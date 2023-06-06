@@ -30,8 +30,7 @@ public static class TelegramBot
             try { await HandleUpdate(u); }
             catch (Exception e)
             {
-                Console.WriteLine($"Error >> Ошибка обработки сообщения: {e.Message}");
-                return;
+                Console.WriteLine($"TBError >> Ошибка обработки сообщения: {e.Message}");
             }
         }, HandleError);
     }
@@ -116,7 +115,7 @@ public static class TelegramBot
 
     private static async Task RequestPosibleGroup(long chatID, int course)
     {
-        var groups = CouplesSchedule.StudyGroups.Where(x => x.Course == course).Select(x => x.GroupName).Order().ToArray();
+        var groups = Schedule.StudyGroups.Where(x => x.Course == course).Select(x => x.GroupName).Order().ToArray();
         var buttons = new InlineKeyboardButton[groups.Count() + 1][];
 
         for (int i = 0; i < groups.Count(); i++)
@@ -167,7 +166,7 @@ public static class TelegramBot
 
     private static async Task HandePrintCouplesSelection(TelegramUser user)
     {
-        if (user.GroupName is null || !CouplesSchedule.StudyGroups.Any(x => x.Course == user.Course && x.GroupName == user.GroupName))
+        if (user.GroupName is null || !Schedule.StudyGroups.Any(x => x.Course == user.Course && x.GroupName == user.GroupName))
         {
             await _TBClient.SendTextMessageAsync(user.ChatID, "Ваша группа не найдена в расписании. Вероятно, в обновлённом рассписании её назвали как-то подругому. Выберите её заново.");
             await RestartRegistration(user);
@@ -176,7 +175,7 @@ public static class TelegramBot
 
         await _TBClient.SendTextMessageAsync(user.ChatID, $"Расписание для {user.Course} - {user.GroupName}");
 
-        var days = CouplesSchedule.Couples.Where(x => x.Course == user.Course && x.Group == user.GroupName).GroupBy(x => x.Date);
+        var days = Schedule.Couples.Where(x => x.Course == user.Course && x.Group == user.GroupName).GroupBy(x => x.Date);
 
         foreach (var day in days)
         {
@@ -241,6 +240,6 @@ public static class TelegramBot
 
     private static Task HandleError(ITelegramBotClient tbc, Exception e, CancellationToken ct)
     {
-        throw new NotImplementedException();
+        throw e;
     }
 }
