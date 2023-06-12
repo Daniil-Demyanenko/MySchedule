@@ -68,7 +68,7 @@ public static class TelegramBot
 
         if (update.IsMessageType())
         {
-            await HandeBugreport(update, user);
+            await HandleBugreport(update, user);
             return;
         }
 
@@ -80,16 +80,16 @@ public static class TelegramBot
         switch (command)
         {
             case "COURSE":
-                await HandeCourseSelection(update, user);
+                await HandleCourseSelection(update, user);
                 return;
             case "GROUP":
-                await HandeGroupSelection(update, user);
+                await HandleGroupSelection(update, user);
                 return;
             case "RESET":
                 await RestartRegistration(user);
                 return;
             case "PRINT":
-                await HandePrintCouplesSelection(user);
+                await HandlePrintCouplesSelection(user);
                 return;
         }
     }
@@ -115,7 +115,7 @@ public static class TelegramBot
         await _TBClient.SendTextMessageAsync(chatID, "Выберите курс:", replyMarkup: ikm);
     }
 
-    private static async Task HandeCourseSelection(Update update, TelegramUser user)
+    private static async Task HandleCourseSelection(Update update, TelegramUser user)
     {
         int course = int.Parse(update.CallbackQuery.Data.Split('_', StringSplitOptions.RemoveEmptyEntries)[1]);
 
@@ -143,7 +143,7 @@ public static class TelegramBot
         await _TBClient.SendTextMessageAsync(chatID, "Выберите группу:", replyMarkup: keyboard);
     }
 
-    private static async Task HandeGroupSelection(Update update, TelegramUser user)
+    private static async Task HandleGroupSelection(Update update, TelegramUser user)
     {
         Match matches = Regex.Match(update.CallbackQuery.Data, "^GROUP_(.*)");
         user.GroupName = matches.Groups[1].ToString();
@@ -153,7 +153,7 @@ public static class TelegramBot
         _DB.Update(user);
         await _DB.SaveChangesAsync();
 
-        await HandePrintCouplesSelection(user);
+        await HandlePrintCouplesSelection(user);
     }
 
     private static async Task RestartRegistration(TelegramUser user)
@@ -168,7 +168,7 @@ public static class TelegramBot
         await RequestCourse(user.ChatID);
     }
 
-    private static async Task HandeBugreport(Update update, TelegramUser user)
+    private static async Task HandleBugreport(Update update, TelegramUser user)
     {
         var from = update.Message.From;
         BugreportNote note = new(from.FirstName, from.LastName, from.Username, update.Message.Text, user);
@@ -180,7 +180,7 @@ public static class TelegramBot
             "Спасибо за ваш отсчёт об ошибке! Постараемся решить в скорейшее время.");
     }
 
-    private static async Task HandePrintCouplesSelection(TelegramUser user)
+    private static async Task HandlePrintCouplesSelection(TelegramUser user)
     {
         if (user.GroupName is null ||
             !Schedule.StudyGroups.Any(x => x.Course == user.Course && x.GroupName == user.GroupName))
