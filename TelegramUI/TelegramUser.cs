@@ -3,8 +3,8 @@ using System.ComponentModel.DataAnnotations;
 namespace MySchedule.TelegramUI;
 public class TelegramUser
 {
-    [Key]
-        public long Id { get; set; }
+        // public long Id { get; set; }
+        [Key]
         public long ChatID { get; set; }
         public int? Course { get; set; }
         public string GroupName { get; set; }

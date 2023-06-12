@@ -1,18 +1,19 @@
 ﻿using System;
 using System.Threading;
+using System.Threading.Tasks;
 using MySchedule.TelegramUI;
 
 namespace MySchedule;
 
-internal class Program
+internal static class Program
 {
-    private static void Main(string[] args)
+    private static async Task Main(string[] args)
     {
         if (args.Length != 1) throw new Exception("Не указан токен для бота.");
 
         SetUpdateScheduleTimer(); //Запускаем таймер, проверяющий обновление расписаний каждые 4 часа
-        while (Schedule.Couples is null) Thread.Sleep(100);
-        TelegramBot.Start(args[0]);
+        while (Schedule.Couples is null) await Task.Delay(100);
+        await TelegramBot.Start(args[0]);
 
 
         Console.WriteLine("Press 'q' to stop program and exit...");

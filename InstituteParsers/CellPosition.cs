@@ -5,10 +5,9 @@ using System.Threading.Tasks;
 
 namespace MySchedule.InstituteParsers
 {
-    public class CellPosition
+    public record CellPosition(int Col, int Row)
     {
-        public int Col;
-        public int Row;
-        public CellPosition(int col, int row){Col = col; Row = row;}
+        public int Col = Col;
+        public int Row = Row;
     }
 }

@@ -114,7 +114,7 @@ public class TemplateScheduleParser : IDisposable
                 CultureInfo culture = new("ru-RU");
                 string dateStr = _Sheet.Cells[i, 1].Value?.ToString()?.Trim();
                 DateTime date = DateTime.Parse(dateStr, culture);
-                dayPosition.Add(new DayData(pos: i, name: cellValue, date: date));
+                dayPosition.Add(new DayData(Pos: i, Name: cellValue, Date: date));
             }
         }
 
@@ -243,7 +243,7 @@ public class TemplateScheduleParser : IDisposable
     /// <summary>
     /// Строка является названием дня недели?
     /// </summary>
-    public static bool IsContainDayOfWeek(string str)
+    private static bool IsContainDayOfWeek(string str)
     {
         var days = new string[] { "понедельник", "вторник", "среда", "четверг", "пятница", "суббота" };
         return days.Any(day => str.Contains(day, StringComparison.InvariantCultureIgnoreCase));
@@ -252,16 +252,14 @@ public class TemplateScheduleParser : IDisposable
     /// <summary>
     /// Положение и название дня недели
     /// </summary>
-    protected record DayData
+    protected record DayData(int Pos, string Name, DateTime Date)
     {
         /// <summary>
         /// Столбец группы
         /// </summary>
-        public int Pos;
-        public string Name;
-        public DateTime Date;
-        public DayData(int pos, string name, DateTime date) => (Pos, Name, Date) = (pos, name, date);
-
+        public readonly int Pos = Pos;
+        public readonly string Name = Name;
+        public DateTime Date = Date;
     }
 }
 
