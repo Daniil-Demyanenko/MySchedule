@@ -1,11 +1,9 @@
 using System;
 using System.IO;
-using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using HtmlAgilityPack;
 using Newtonsoft.Json;
-using System.Text;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -77,10 +75,7 @@ public static class ScheduleDownloader
         {
             HtmlNodeCollection xpathLink = document.DocumentNode.SelectNodes($"//tr[3]/td[{i + 2}]/p/a");
             if (xpathLink != null)
-            {
                 links.Add((_shceduleNames[i], xpathLink[0].GetAttributeValue("href", "")));
-                continue;
-            }
         }
 
         return links;

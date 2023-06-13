@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading;
 using System.Threading.Tasks;
 using MySchedule.TelegramUI;
 
@@ -13,7 +12,7 @@ internal static class Program
 
         SetUpdateScheduleTimer(); //Запускаем таймер, проверяющий обновление расписаний каждые 4 часа
         while (Schedule.Couples is null) await Task.Delay(100);
-        await TelegramBot.Start(args[0]);
+        TelegramBot.Start(args[0]);
 
 
         Console.WriteLine("Press 'q' to stop program and exit...");
@@ -32,7 +31,7 @@ internal static class Program
 
         var updateInterval = new TimeSpan(hours: 4, minutes: 5, seconds: 0);
         var updateTimer = new System.Timers.Timer(updateInterval);
-        updateTimer.Elapsed += (s, e) => FullUpdate();
+        updateTimer.Elapsed += (_, _) => FullUpdate();
 
         updateTimer.AutoReset = true;
         updateTimer.Enabled = true;

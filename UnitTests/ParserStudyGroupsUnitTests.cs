@@ -18,7 +18,7 @@ namespace MySchedule.UnitTests
             Assert.Equal(43, actual);
         }
 
-
+        [Fact]
         public void ParsingTestOFOMAG_GroupCountInStudyGroups()
         {
             var actual = GetStudyGroups(Paths.OFOMAG).Count;
@@ -35,13 +35,10 @@ namespace MySchedule.UnitTests
         }
 
 
-
-        public static List<StudyGroup> GetStudyGroups(string path)
+        private static List<StudyGroup> GetStudyGroups(string path)
         {
             using var parser = new TemplateScheduleParser(path);
-            parser.Parse();
-            var couples = parser.StudyGroups;
-            return couples.ToList();
+            return parser.StudyGroups;
         }
     }
 }

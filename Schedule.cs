@@ -38,9 +38,9 @@ public static class Schedule
         files.AsParallel().ForAll((file)=>{
             try
             {
-                using var IFMOIOT = new TemplateScheduleParser(file);
-                tempCouples.AddRange(IFMOIOT.Parse());
-                tempStudyGroups.AddRange(IFMOIOT.StudyGroups);
+                using var ifmoiot = new TemplateScheduleParser(file);
+                tempCouples.AddRange(ifmoiot.Couples);
+                tempStudyGroups.AddRange(ifmoiot.StudyGroups);
             }
             catch (Exception e)
             {
