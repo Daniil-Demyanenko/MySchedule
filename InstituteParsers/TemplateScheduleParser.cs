@@ -239,12 +239,10 @@ public class TemplateScheduleParser : IDisposable
     // Возвращает ячейку, с которой начинается само расписание (без шапки, скрытых строк/столбцов)
     private CellPosition GetFirstVisibleCell()
     {
-        int colCount = 1000;
-
         for (var row = 7; row < 1000; row++)
         {
             if (_sheet.Cells.Rows[row].IsHidden) continue;
-            for (int col = 3; col < colCount; col++)
+            for (int col = 3; col < 1000; col++)
             {
                 if (_sheet.Cells.Columns[col].IsHidden) continue;
 
@@ -259,9 +257,8 @@ public class TemplateScheduleParser : IDisposable
     // Ищем нужную страницу в файле расписания
     private Worksheet FindPageWithSchedule()
     {
-        for (int i = 0; i < _workbook.Worksheets.Count; i++)
+        foreach (var sheet in _workbook.Worksheets)
         {
-            using var sheet = _workbook.Worksheets[i];
             if (sheet.Cells.MaxDataColumn >= 10 && sheet.Cells.MaxDataRow >= 7) return sheet;
         }
 

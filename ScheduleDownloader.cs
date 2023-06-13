@@ -14,7 +14,7 @@ public static class ScheduleDownloader
     /// <summary>
     /// Путь к дирректирии с расписаниями
     /// </summary>
-    public static readonly string CacheDir = AppDomain.CurrentDomain.BaseDirectory + "/Cache"; //Путь к папке Cache в директории программы
+    public static readonly string CacheDir = AppDomain.CurrentDomain.BaseDirectory + "Cache"; //Путь к папке Cache в директории программы
     private static readonly HttpClient _client = new HttpClient();
     private static readonly string[] _shceduleNames = { "/ИФМОИОТ_ОФО_БАК.", "/ИФМОИОТ_ЗФО_БАК.", "/ИФМОИОТ_ОФО_МАГ.", "/ИФМОИОТ_ЗФО_МАГ." };
 
@@ -52,7 +52,7 @@ public static class ScheduleDownloader
 
     private static async Task Download()
     {
-        var parsedLinks = await ParseLinkFromPage();
+        var parsedLinks = await ParseLinksFromPage();
         foreach (var item in parsedLinks)
         {
             (string name, string link) = GetDirectLinkAsync(item.Item2).Result;
@@ -65,12 +65,13 @@ public static class ScheduleDownloader
         }
     }
 
-    private static async Task<List<(string, string)>> ParseLinkFromPage()
+    private static async Task<List<(string Name, string Link)>> ParseLinksFromPage()
     {
         var link = await LoadPage(@"https://lgpu.org/elektronnyy-resurs-distancionnogo-obucheniya-ifmit.html");
         var document = new HtmlDocument();
         document.LoadHtml(link);
         List<(string, string)> links = new();
+        
         for (int i = 0; i < 4; i++) //Перебираем со 2 по 5 ячейку в таблице расписаний
         {
             HtmlNodeCollection xpathLink = document.DocumentNode.SelectNodes($"//tr[3]/td[{i + 2}]/p/a");
@@ -94,7 +95,7 @@ public static class ScheduleDownloader
         return result;
     }
 
-    static async Task<(string, string)> GetDirectLinkAsync(string url)
+    private static async Task<(string Name, string File)> GetDirectLinkAsync(string url)
     {
         using var request = new HttpRequestMessage(HttpMethod.Get, $"https://cloud-api.yandex.net/v1/disk/public/resources?public_key={url}");
         using var response = await _client.SendAsync(request);
