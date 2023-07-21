@@ -52,5 +52,4 @@ public static class Schedule
         _studyGroups = tempStudyGroups;
         Console.WriteLine($"Info >> Обновлено {_couples.Count} пар.");
     }
-
 }

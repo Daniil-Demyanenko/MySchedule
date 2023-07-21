@@ -183,14 +183,15 @@ public static class TelegramBot
             !Schedule.StudyGroups.Any(x => x.Course == user.Course && x.GroupName == user.GroupName))
         {
             await _tbClient.SendTextMessageAsync(user.ChatID,
-                "Ваша группа не найдена в расписании. Вероятно, в обновлённом рассписании её назвали как-то подругому. Выберите её заново.");
+                "Ваша группа не найдена в расписании. Вероятно, в обновлённом рассписании её назвали как-то подругому (с маленькой буквы, без скобок, т.д.). " +
+                "Выберите её заново.");
             await RestartRegistration(user);
             return;
         }
 
         await _tbClient.SendTextMessageAsync(user.ChatID, $"Расписание для {user.Course} - {user.GroupName}");
 
-        var days = Schedule.Couples.Where(x => x.Course == user.Course && x.Group == user.GroupName)
+        var days = Schedule.Couples.Where(x => x.Course == user.Course && x.Group == user.GroupName && x.Date >= DateTime.Now - TimeSpan.FromDays(3))
             .GroupBy(x => x.Date);
 
         foreach (var day in days)
@@ -210,7 +211,8 @@ public static class TelegramBot
         var keyboard = new InlineKeyboardMarkup(buttons);
 
         await _tbClient.SendTextMessageAsync(user.ChatID,
-            "<i>Если вы заметили какую-то ошибку в работе этого бота, пожалуйста, сообщите о ней разработчикам. Это можно сделать просто подробно описав и отправив её в сообщении этому боту.</i>",
+            "<i>Если вы заметили какую-то ошибку в работе этого бота, пожалуйста, сообщите о ней разработчикам. " +
+            "Это можно сделать просто подробно описав и отправив её в сообщении этому боту.</i>",
             parseMode: Telegram.Bot.Types.Enums.ParseMode.Html, replyMarkup: keyboard);
     }
 
